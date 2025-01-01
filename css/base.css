@@ -347,22 +347,14 @@ img {
 }
 .content .me-card {
   width: fit-content;
-  min-width: 285px;
-  transform: translateY(-351px);
-  height: 780px;
-  /* backgrounbad-color: var(--headerCOlor); */
-  border-radius: 10px;
+  min-width: 230px;
+  transform: translateY(-210px);
+  height: 410px;
+  border-radius: 20px;
   text-align: center;
   border: 1px solid var(--headerCOlor);
-  padding: 0px 30px;
+  padding: 20px 30px;
 }
-
-
-/* 左边吸盘 */
-.mecar-title {
-  margin-top: 40px;
-}
-
 
 .me-hover span{
   margin: 0 auto;
@@ -394,7 +386,7 @@ img {
   /* border-style: dashed; */
   border-bottom: 1px dashed rgb(187, 185, 185);
   height: 0px;
-  margin: 35px 0;
+  margin: 50px 0;
 }
 
 .mecar-title .me-image {
@@ -402,8 +394,8 @@ img {
   display: inline-block;
 }
 .me-image>img{
-  width: 100px;
-  height: 100px;
+  width: 180px;
+  height: 180px;
   border: solid 3px #FCFCFE;
   border-radius: 50%;
   box-shadow: 0 2px 4px -2px rgb(0 0 0 / 15%);
