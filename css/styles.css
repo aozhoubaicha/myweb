@@ -185,7 +185,9 @@ nav a:hover {
     color: #333;
     text-decoration: none;
 }
-
+.indented {
+    text-indent: 2em; /* 设置首行缩进为2个字符的宽度 */
+}
 /* 插入图片样式 */
 .post img {
     position: absolute; /* 绝对定位 */
