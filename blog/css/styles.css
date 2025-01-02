@@ -182,3 +182,29 @@ nav a:hover {
     text-align: center;
     padding: 0rem 0;
 }
+/* 媒体查询 */
+@media (max-width: 768px) {
+    .container {
+        width: 100%; /* 全宽 */
+        padding: 1rem; /* 减少内边距 */
+    }
+    nav {
+        flex-direction: column; /* 改为列布局 */
+        align-items: center; /* 居中对齐 */
+    }
+    nav a {
+        padding: 0.5rem; /* 减少内边距 */
+    }
+    .sidebar {
+        width: 100%; /* 占满容器宽度 */
+        margin-top: 1rem; /* 增加上外边距 */
+    }
+    .main-content {
+        flex-direction: column; /* 改为列布局 */
+    }
+    .main-page, .main-posts {
+        margin-left: 0; /* 移除左外边距 */
+        margin-right: 0; /* 移除右外边距 */
+        padding: 1rem; /* 增加内边距 */
+    }
+}
