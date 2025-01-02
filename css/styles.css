@@ -97,10 +97,25 @@ nav a:hover {
 }
 
 /* 右侧主内容样式 */
+.main-page {
+    margin-top:  20px;    /* 上外边距20像素 */
+    margin-bottom:  20px;    /* 上外边距20像素 */
+    margin-left:  20px;    /* 左外边距20像素 */
+    border-radius: 15px; /* 增加圆角效果 */
+    background-color: #fff;
+    flex: 1; /* 占据剩余空间 */
+    padding: 0 2rem; /* 添加一些间距 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.header-image {
+    width: 100%;
+    height: auto;
+}
+/* 右侧博客容样式 */
 .main-posts {
     margin-top:  20px;    /* 上外边距20像素 */
     margin-left:  20px;    /* 左外边距20像素 */
-    margin-bottom:  20px;    /* 下外边距20像素 */
     border-radius: 15px; /* 增加圆角效果 */
     background-color: #fff;
     flex: 1; /* 占据剩余空间 */
