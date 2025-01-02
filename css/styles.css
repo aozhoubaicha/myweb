@@ -45,6 +45,18 @@ nav a:hover {
 /* 左侧悬浮块样式 */
 .sidebar {
     width: 200px;
+    height: auto;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* 确保侧边栏不会缩小 */
+    border-radius: 15px; /* 增加圆角效果 */
+    margin-top:  20px;    /* 上外边距20像素 */
+    background-color: #fff;
+    position: sticky;
+    top: 0;   
+}
+.sidebar2 {
+    width: 200px;
     height: 520px;
     padding: 1rem;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
