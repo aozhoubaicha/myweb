@@ -45,7 +45,7 @@ nav a:hover {
 /* 左侧悬浮块样式 */
 .sidebar {
     width: 200px;
-    height: 500px;
+    height: 520px;
     padding: 1rem;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     flex-shrink: 0; /* 确保侧边栏不会缩小 */
@@ -59,6 +59,11 @@ nav a:hover {
 .profile {
     text-align: center;
     margin-bottom: 2rem;
+    margin-top: 20px;
+    transition: transform 0.3s ease; /* 添加过渡效果 */
+}
+.profile:hover {
+    transform: scale(1.05); /* 放大到原来的1.05倍 */
 }
 
 .profile .avatar {
@@ -70,6 +75,9 @@ nav a:hover {
 
 .profile h3 {
     margin-top: 0.5rem;
+    padding-top: 10px;
+    font-size: 20px;
+    margin-bottom: -10px;
 }
 
 .sidebar-nav ul {
@@ -127,6 +135,7 @@ nav a:hover {
 }
 .header-image {
     width: 100%;
+    margin-bottom: 20px;
     height: auto;
 
 }
@@ -148,6 +157,7 @@ nav a:hover {
 .main-posts h1 {
     margin-top:  20px;    /* 上外边距20像素 */
     margin-top: 0;
+    transition: box-shadow 0.3s ease-in-out; /* 添加过渡效果 */
 }
 
 .blog-posts {
