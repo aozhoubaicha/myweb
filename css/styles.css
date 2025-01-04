@@ -290,3 +290,6 @@ nav a:hover {
     position: sticky;
     top: 0;   
 }
+audio {
+    display: none;
+}
