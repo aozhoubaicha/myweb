@@ -23,15 +23,15 @@
     <!-- 左侧悬浮块 -->
     <aside class="sidebar">
         <div class="profile">
-            <img alt="" class="avatar">
+            <img src="./img/toux.png" alt="" class="avatar">
             <h3>澳洲白茶</h3>
         </div>
         <nav class="sidebar-nav">
             <ul>
                 <li><a href="./index.html">主页</a></li>
-                <li><a href="#">博客</a></li>
-                <li><a href="#">图文集</a></li>
-                <li><a href="#">友情链接</a></li>
+                <li><a href="./blog.html">博客</a></li>
+                <li><a href="#">资源</a></li>
+                <li><a href="./friend.html">友情链接</a></li>
             </ul>
         </nav>
         <div class="social-icons">
@@ -47,33 +47,31 @@
         <input type="text" id="searchInput" placeholder="输入关键词进行搜索...">
         <button onclick="performSearch()">搜索</button>
         <div id="searchResults" class="search-results"></div>
-        <div class="blog-posts">
-            <div class="post">
-                <h2><a href="./blog/blog_1.html" class="read-more">故事开始的第一篇</a></h2>
-                <p>关于开始，以及其他...</p>
-                    <img alt="" class="post img">
+            <div class="file-download">
+                <h2>文件下载</h2>
+                <p>测试文件</p>
+                <ul>
+                    <li>
+                        <a href="/path/to/your/file.pdf" download="file.pdf">文件名 (点击下载)</a>
+                    </li>
+                    <!-- 你可以继续添加更多的文件链接 -->
+                </ul>
             </div>
-            <article class="post">
-                <h2>第二篇博文</h2>
-                <p>这是第二篇博文的内容...</p>
-                <a href="#" class="read-more">阅读更多</a>
-            </article>
+            <div class="file-download">
+                <h2>文件下载2</h2>
+                <p>测试文件</p>
+                <ul>
+                    <li>
+                        <a href="/path/to/your/file.pdf" download="file.pdf">文件名 (点击下载)</a>
+                    </li>
+                    <!-- 你可以继续添加更多的文件链接 -->
+                </ul>
+            </div>
             <!-- 你可以继续添加更多的博文 -->
         </div>
     </section>
-    <!-- 文件展示和下载部分 -->
-    <section class="file-download">
-        <h2>文件下载</h2>
-        <p>以下是可供下载的文件：</p>
-        <ul>
-            <li>
-                <a href="/path/to/your/file.pdf" download="file.pdf">文件名 (点击下载)</a>
-            </li>
-            <!-- 你可以继续添加更多的文件链接 -->
-        </ul>
-    </section>
 </main>
-
+    </section>
     <!-- 页脚 -->
     <footer class="footer">
         <div class="container">
