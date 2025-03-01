@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乱动之大图书馆</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/png" href="./img/ico.png">
+
+</head>
+<body>
+ <!-- 主内容区 -->
+ <main class="container main-content">
+    <!-- 左侧悬浮块 -->
+     <div class="sidebar">
+        <div class="profile">
+            <img src="./img/toux.png" alt="" class="avatar">
+            <h3>澳洲白茶</h3>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="./index.html">主页</a></li>
+                <li><a href="./blog.html">博客</a></li>
+                <li><a href="./rsc.html">资源</a></li>
+                <li><a href="./friend.html">友情链接</a></li>
+                <li><a href="./about.html">关于</a></li>
+            </ul>
+        </nav>
+        <div class="social-icons">
+            <a href="https://github.com/aozhoubaicha" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.zhihu.com" target="_blank"><i class="fab fa-zhihu"></i></a>
+            <a href="https://space.bilibili.com" target="_blank"><i class="fab fa-bilibili"></i></a>
+        </div>
+     </div>
+    
+    <!-- 页脚 -->
+     <div class="sidebar2">
+    # 2025 <a href="./about.html" style="color: rgb(0, 0, 0);text-decoration: none;">澳洲白茶</a>
+     </div>
+
+
+
+    <!-- 右侧主内容 -->
+     <div class="floatbox">
+        <div class="main-page">
+            <div class="content">
+                <h2><p class="fadetext">信仰是为了虚妄之人</p></h2>
+                <div class="fade-in">
+                <img src="./img/bizhi.jpg" alt="头图" class="header-image">
+                </div>
+            </div>
+        </div>
+     </div>
+    
+</main>
+
+    <!-- 引入JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+<script src="scripts/main.js"></script>
+
+<script>
+    window.onload = function() {  
+  var textElement = document.querySelector('.fadetext');  
+  textElement.classList.add('active');  
+};  
+</script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PSEF2690CE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PSEF2690CE');
+</script>
