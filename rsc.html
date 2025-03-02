@@ -21,32 +21,32 @@
 <body>
  <!-- 主内容区 -->
  <main class="container main-content">
-    <!-- 左侧悬浮块 -->
-     <div class="sidebar">
-        <div class="profile">
-            <img src="./img/toux.png" alt="" class="avatar">
-            <h3>澳洲白茶</h3>
+    <!-- 左侧栏 -->
+    <aside class="sidebar-container">
+        <div class="sidebar">
+            <div class="profile" role="img" aria-label="澳洲白茶个人资料">
+                <img src="./img/toux.png" alt="头像" class="avatar">
+                <h3>澳洲白茶</h3>
+            </div>
+            <nav class="sidebar-nav" aria-label="侧边导航">
+                <ul>
+                    <li><a href="./index.html">主页</a></li>
+                    <li><a href="./blog.html">博客</a></li>
+                    <li><a href="./rsc.html">资源</a></li>
+                    <li><a href="./friend.html">友情链接</a></li>
+                    <li><a href="./about.html">关于</a></li>
+                </ul>
+            </nav>
+            <div class="social-icons" aria-label="社交媒体链接">
+                <a href="https://github.com/aozhoubaicha" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://www.zhihu.com" target="_blank" aria-label="知乎"><i class="fab fa-zhihu"></i></a>
+                <a href="https://space.bilibili.com" target="_blank" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+            </div>
         </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="./index.html">主页</a></li>
-                <li><a href="./blog.html">博客</a></li>
-                <li><a href="./rsc.html">资源</a></li>
-                <li><a href="./friend.html">友情链接</a></li>
-                <li><a href="./about.html">关于</a></li>
-            </ul>
-        </nav>
-        <div class="social-icons">
-            <a href="https://github.com/aozhoubaicha" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="https://www.zhihu.com" target="_blank"><i class="fab fa-zhihu"></i></a>
-            <a href="https://space.bilibili.com" target="_blank"><i class="fab fa-bilibili"></i></a>
-        </div>
-     </div>
-    
-    <!-- 页脚 -->
-     <div class="sidebar2">
-    # 2025 <a href="./about.html" style="color: rgb(0, 0, 0);text-decoration: none;">澳洲白茶</a>
-     </div>
+        <footer class="sidebar2">
+            # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
+        </footer>
+    </aside>
 
 
     <!-- 右侧主内容 -->
@@ -102,22 +102,33 @@
     </section>
 
     <!-- 引入JavaScript -->
-    <script src="scripts/main.js"></script>
+    <input type="text" id="searchInput" placeholder="输入关键词进行搜索..." aria-label="搜索">
+    <button onclick="performSearch()" aria-label="执行搜索">搜索</button>
+    <div id="searchResults" class="search-results"></div>
+    
     <script>
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    
         function performSearch() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
+            const input = document.getElementById('searchInput').value.toLowerCase().trim();
             const posts = document.querySelectorAll('.post');
             const resultsContainer = document.getElementById('searchResults');
-            resultsContainer.innerHTML = ''; // 清空之前的搜索结果
-
-            if (input === '') {
+            resultsContainer.innerHTML = '';
+    
+            if (!input) {
                 resultsContainer.innerHTML = '<p>请输入关键词进行搜索。</p>';
                 return;
             }
-
+    
             let found = false;
             posts.forEach(post => {
-                if (post.innerText.toLowerCase().includes(input)) {
+                if (post.textContent.toLowerCase().includes(input)) {
                     found = true;
                     const resultDiv = document.createElement('div');
                     resultDiv.classList.add('search-result');
@@ -125,11 +136,14 @@
                     resultsContainer.appendChild(resultDiv);
                 }
             });
-
-            if (!found) {
-                resultsContainer.innerHTML = '<p>没有找到匹配的结果。</p>';
-            }
+    
+            resultsContainer.innerHTML = found ? resultsContainer.innerHTML : '<p>没有找到匹配的结果。</p>';
         }
+    
+        document.getElementById('searchInput').addEventListener('input', debounce(performSearch, 300));
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
     </script>
 </body>
 </html>
