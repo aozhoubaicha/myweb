@@ -24,3 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 保存用户偏好到本地存储
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
+
+    window.onload = function() {
+        document.querySelector('.fadetext').classList.add('active');
+        setTimeout(() => {
+            document.body.classList.add('animation-complete');
+            document.querySelector('.opening-overlay').remove();
+        }, 1500); // 匹配动画总时长（1.2s + 0.3s）
+    };

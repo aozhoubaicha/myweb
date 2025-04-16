@@ -7,8 +7,25 @@ body {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #f4f4f4, #d9e4f5); /* 增强背景 */
     transition: background-color 0.3s, color 0.3s;
+}
+/* 玻璃磨砂效果 */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+/* 对于不支持 backdrop-filter 的浏览器 */
+@supports not (backdrop-filter: blur(10px)) {
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.8); /* 更不透明的回退背景 */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
 }
 /* 容器公共样式 */
 .container, .container2 {

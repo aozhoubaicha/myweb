@@ -1,0 +1,108 @@
+/* 开场动画容器 */
+.opening-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeOut 0.3s ease-in-out 1.2s forwards; /* 1.2秒后淡出，持续0.3秒 */
+}
+
+/* 文字容器 */
+.title-container {
+    text-align: center;
+    position: absolute;
+    z-index: 2; /* 确保文字在长菱形之上 */
+    animation: fadeTextOut 0.3s ease-in-out 0.9s forwards; /* 0.9秒后淡出，持续0.3秒 */
+}
+
+/* 白色大字 */
+.title-main {
+    color: #fff;
+    font-size: 48px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* 浅灰色小字 */
+.title-sub {
+    color: #b0b0b0;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+/* 长菱形样式 */
+.diamond {
+    position: absolute;
+    width: 100px; /* 宽度 */
+    height: 200px; /* 高度，长菱形 */
+    background: rgba(255, 255, 255, 0.2); /* 半透明白色 */
+    transform: rotate(45deg); /* 旋转45度形成菱形 */
+    z-index: 1; /* 在文字之下，圆之上 */
+    animation: fadeDiamondOut 0.3s ease-in-out 0.9s forwards; /* 与文字同步淡出 */
+}
+
+/* 透明圆形镂空效果 */
+.transparent-circle {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 0%, transparent 50px, #000 51px, #000 100%);
+    animation: expandCircle 1s ease-out 0.2s forwards; /* 0.2秒后开始，持续1秒 */
+}
+
+/* 圆形扩展动画 */
+@keyframes expandCircle {
+    0% {
+        background: radial-gradient(circle, transparent 0%, transparent 0px, #000 1px, #000 100%);
+    }
+    100% {
+        background: radial-gradient(circle, transparent 0%, transparent 500px, #000 501px, #000 100%);
+    }
+}
+
+/* 遮罩层淡出动画 */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+/* 文字淡出动画 */
+@keyframes fadeTextOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* 长菱形淡出动画 */
+@keyframes fadeDiamondOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* 防止主内容在动画期间滚动 */
+body {
+    overflow: hidden;
+}
+
+/* 动画结束后恢复滚动 */
+body.animation-complete {
+    overflow: auto;
+}
