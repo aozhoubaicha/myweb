@@ -1,0 +1,30 @@
+/* 全局样式：设置页面基础样式和重置默认样式 */
+body {
+    font-family: Arial, sans-serif; /* 默认字体 */
+    line-height: 1.6; /* 行高 */
+    margin: 0; /* 移除默认外边距 */
+    padding: 0; /* 移除默认内边距 */
+    display: flex; /* 使用弹性布局 */
+    min-height: 100vh; /* 最小高度为视口高度 */
+    flex-direction: column; /* 垂直排列子元素 */
+    background: linear-gradient(135deg, #f4f4f4, #d9e4f5); /* 渐变背景 */
+    transition: background-color 0.3s, color 0.3s; /* 背景和文字颜色平滑过渡 */
+}
+
+/* 玻璃磨砂效果：用于创建半透明背景效果 */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.2); /* 半透明背景 */
+    backdrop-filter: blur(10px); /* 模糊效果 */
+    -webkit-backdrop-filter: blur(10px); /* 兼容 Safari */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* 边框 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* 阴影 */
+    border-radius: 15px; /* 圆角 */
+}
+
+/* 兼容不支持 backdrop-filter 的浏览器 */
+@supports not (backdrop-filter: blur(10px)) {
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.8); /* 回退背景 */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 更强的阴影 */
+    }
+}

@@ -1,0 +1,30 @@
+/* 渐隐效果：用于文本淡入 */
+.fadetext {
+    opacity: 0; /* 初始透明 */
+    transition: opacity 1s ease; /* 透明度过渡 */
+}
+
+.fadetext.active {
+    opacity: 1; /* 激活时完全不透明 */
+}
+
+/* 淡入动画 */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out; /* 淡入动画 */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; } /* 初始透明 */
+    to { opacity: 1; } /* 完全不透明 */
+}
+
+/* 浮动效果：用于悬停时上下浮动 */
+.floatbox:hover {
+    transform: translateY(-10px); /* 初始上移 */
+    animation: float 1.5s ease-in-out infinite; /* 浮动动画 */
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(-10px); } /* 上下浮动起始和结束 */
+    50% { transform: translateY(-15px); } /* 中间位置 */
+}

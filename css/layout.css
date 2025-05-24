@@ -1,0 +1,29 @@
+/* 容器样式：定义页面主要内容区域的宽度和溢出处理 */
+.container {
+    width: 80%; /* 容器宽度占页面80% */
+    margin: auto; /* 居中 */
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+.container2 {
+    width: auto; /* 自适应宽度 */
+    margin: auto; /* 居中 */
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 主内容区域：设置左右布局和间距 */
+.main-content {
+    display: flex; /* 弹性布局 */
+    justify-content: center; /* 水平居中 */
+    gap: 40px; /* 元素间距 */
+    padding: 20px; /* 内边距 */
+}
+
+/* 左侧栏容器：容纳侧边栏和所有者信息 */
+.sidebar-container {
+    display: flex; /* 垂直排列侧边栏 */
+    flex-direction: column; /* 垂直布局 */
+    gap: 30px; /* 侧边栏间距 */
+    width: 200px; /* 固定宽度 */
+    margin-right: 20px; /* 与右侧内容间距 */
+}

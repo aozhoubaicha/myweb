@@ -351,7 +351,6 @@ audio {
     0%, 100% { transform: translateY(-10px); }
     50% { transform: translateY(-15px); }
 }
-
 /* 媒体查询 */
 @media (max-width: 768px) {
     .sidebar-container, .sidebar, .sidebar2, .sidebar_f {

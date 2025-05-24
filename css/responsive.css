@@ -1,0 +1,25 @@
+/* 响应式设计：适配小屏幕设备 */
+@media (max-width: 768px) {
+    /* 侧边栏容器 */
+    .sidebar-container, .sidebar, .sidebar2, .sidebar_f {
+        width: 100%; /* 占满宽度 */
+        position: relative; /* 移除粘性定位 */
+        top: 0; /* 顶部对齐 */
+    }
+
+    /* 主内容区域 */
+    .main-content {
+        flex-direction: column; /* 垂直排列 */
+        gap: 20px; /* 间距 */
+    }
+
+    /* 博客和页面内容 */
+    .main-posts, .main-page {
+        padding: 1rem; /* 减少内边距 */
+    }
+
+    /* 文章布局 */
+    .post {
+        flex-direction: column; /* 垂直排列 */
+    }
+}

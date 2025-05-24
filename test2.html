@@ -3,74 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>乱动之大图书馆</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" type="image/png" href="./img/ico.png">
+    <title>乱动的大图书馆 | The Great Library of Immobility</title>
+    <link rel="stylesheet" href="./css/open.css">
+    <link rel="stylesheet" href="styles2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- 主内容区 -->
-     <!-- 切换按钮 -->
-    <button class="theme-toggle" aria-label="切换暗色模式">
-        <i class="fas fa-moon"></i>
-    </button>
-    <main class="container main-content">
-        <!-- 左侧栏 -->
-        <aside class="sidebar-container">
-            <div class="sidebar">
-                <div class="profile" role="img" aria-label="澳洲白茶个人资料">
-                    <img src="./img/toux.png" alt="头像" class="avatar">
-                    <h3>澳洲白茶</h3>
+    <div class="container">
+        <nav class="glass-effect">
+            <h1>乱动的大图书馆</h1>
+            <h2>The Great Library of Immobility</h2>
+        </nav>
+        <div class="main-content">
+            <div class="sidebar-container">
+                <div class="sidebar glass-effect">
+                    <div class="profile fade-in">
+                        <img src="./img/toux.png" alt="Avatar" class="avatar">
+                        <h3>澳洲白茶</h3>
+                    </div>
+                    <div class="sidebar-nav">
+                        <ul>
+                            <li><a href="#">主页</a></li>
+                            <li><a href="#">博客</a></li>
+                            <li><a href="#">资源</a></li>
+                            <li><a href="#">友情链接</a></li>
+                            <li><a href="#">关于</a></li>
+                        </ul>
+                    </div>
+                    <div class="social-icons">
+                        <a href="#"><i class="fas fa-link"></i></a>
+                        <a href="#"><i class="fas fa-link"></i></a>
+                    </div>
                 </div>
-                <nav class="sidebar-nav" aria-label="侧边导航">
-                    <ul>
-                        <li><a href="./index.html">主页</a></li>
-                        <li><a href="./blog.html">博客</a></li>
-                        <li><a href="./rsc.html">资源</a></li>
-                        <li><a href="./friend.html">友情链接</a></li>
-                        <li><a href="./about.html">关于</a></li>
-                    </ul>
-                </nav>
-                <div class="social-icons" aria-label="社交媒体链接">
-                    <a href="https://github.com/aozhoubaicha" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="https://www.zhihu.com" target="_blank" aria-label="知乎"><i class="fab fa-zhihu"></i></a>
-                    <a href="https://space.bilibili.com" target="_blank" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+                <div class="sidebar2 glass-effect">所有者</div>
+            </div>
+            <div class="main-posts glass-effect">
+                <h1>2025 澳洲白茶</h1>
+                <div class="blog-posts">
+                    <div class="post fade-in floatbox">
+                        <div>
+                            <h2>信仰是为了虚妄之人</h2>
+                            <p class="indented">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <a href="#" class="read-more">阅读更多</a>
+                        </div>
+                        <img src="https://via.placeholder.com/200" alt="Post Image">
+                    </div>
                 </div>
             </div>
-            <footer class="sidebar2">
-                # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
-            </footer>
-        </aside>
-
-    <!-- 右侧内容 -->
-    <section class="floatbox">
-        <article class="main-page">
-            <h2><p class="fadetext">信仰是为了虚妄之人</p></h2>
-            <div class="fade-in">
-                <img src="./img/bizhi.jpg" alt="头图" class="header-image">
+        </div>
+        <div class="sidebar_f glass-effect">
+            <div class="profile_f">
+                <h3>友情链接</h3>
             </div>
-        </article>
-    </section>
-    
-</main>
-
-    <!-- 引入JavaScript -->
-    <script src="scripts/main.js"></script>
+            <div class="sidebar_f-nav">
+                <ul>
+                    <li><a href="#">友链1</a></li>
+                    <li><a href="#">友链2</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fadetext, .fade-in').forEach(el => {
+                el.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
-
-<script>
-    window.onload = function() {
-        document.querySelector('.fadetext').classList.add('active');
-    };
-</script>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PSEF2690CE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-PSEF2690CE');
-</script>

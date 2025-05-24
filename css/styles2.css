@@ -1,0 +1,134 @@
+/* 全局样式 */
+body {
+    font-family: 'Rounded M+', Arial, sans-serif; /* 圆润可爱字体 */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffccff, #ffffff); /* 粉白渐变背景 */
+    color: #333;
+}
+
+/* 导航栏 */
+nav {
+    display: flex;
+    justify-content: space-around;
+    background-color: #ff99cc; /* 粉色底 */
+    padding: 1rem;
+    border-bottom: 5px solid #66ccff; /* 蓝色波浪边 */
+    border-radius: 0 0 15px 15px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #66ccff; /* 悬浮变蓝 */
+    transform: scale(1.1); /* 放大一点 */
+    border-radius: 5px;
+}
+
+/* 主内容区 */
+.main-content {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
+    flex: 1;
+}
+
+.main-page, .main-posts {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 加个二次元背景装饰 */
+.main-page::before, .main-posts::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('path/to/cute-anime-bg.png') no-repeat center/cover; /* 二次元背景图 */
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.main-page > *, .main-posts > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* 侧边栏 */
+.sidebar {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.sidebar:hover {
+    transform: translateY(-5px); /* 悬浮浮起来 */
+}
+
+/* 帖子卡片 */
+.post {
+    background: #f4f4f4;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.post:hover {
+    transform: translateY(-5px); /* 悬浮效果 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 图片 */
+.post img {
+    width: 200px;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.post img:hover {
+    transform: scale(1.05); /* 放大一点 */
+}
+
+/* 浮动动画 */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.floatbox {
+    animation: float 3s ease-in-out infinite; /* 小浮动效果 */
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .sidebar {
+        width: 100%;
+    }
+    .post {
+        text-align: center;
+    }
+}

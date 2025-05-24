@@ -1,0 +1,203 @@
+/* 导航栏样式 */
+nav {
+    display: flex; /* 弹性布局 */
+    justify-content: space-around; /* 均匀分布导航项 */
+    background-color: white; /* 背景色 */
+    padding: 1rem; /* 内边距 */
+}
+
+nav a {
+    color: white; /* 文字颜色 */
+    text-decoration: none; /* 移除下划线 */
+    padding: 0.5rem 1rem; /* 内边距 */
+    transition: background-color 0.3s; /* 背景颜色过渡 */
+}
+
+nav a:hover {
+    background-color: #c6ffff45; /* 悬停背景色 */
+    color: white; /* 悬停文字颜色 */
+}
+
+/* 侧边栏容器：包含左侧栏、所有者信息和友链 */
+.sidebar-container {
+    display: flex; /* 垂直排列侧边栏 */
+    flex-direction: column; /* 垂直布局 */
+    gap: 30px; /* 侧边栏间距 */
+    width: 200px; /* 固定宽度 */
+    margin-right: 20px; /* 与右侧内容间距 */
+    transition: transform 0.3s ease; /* 平滑移动过渡 */
+}
+
+.sidebar-container:hover {
+    transform: translateY(-5px); /* 鼠标悬停时向上移动5像素 */
+}
+
+/* 当侧边栏容器悬停时，增强子元素的阴影效果 */
+.sidebar-container:hover .sidebar,
+.sidebar-container:hover .sidebar2,
+.sidebar-container:hover .sidebar_f {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 悬停时加深阴影，视觉上更贴合元素 */
+}
+
+/* 侧边栏样式：包括左侧栏、所有者信息和友链 */
+.sidebar, .sidebar2, .sidebar_f {
+    padding: 1rem; /* 内边距 */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 默认阴影 */
+    border-radius: 15px; /* 圆角 */
+    background-color: #fff; /* 背景色 */
+    transition: box-shadow 0.3s ease; /* 阴影平滑过渡 */
+}
+
+.sidebar {
+    width: 200px; /* 固定宽度 */
+    height: 580px; /* 固定高度 */
+    position: sticky; /* 粘性定位 */
+    top: 20px; /* 顶部间距 */
+}
+
+.sidebar2 {
+    width: 200px; /* 固定宽度 */
+    height: 30px; /* 固定高度 */
+    position: sticky; /* 粘性定位 */
+    top: 620px; /* 顶部间距 */
+    text-align: center; /* 文字居中 */
+}
+
+.sidebar_f {
+    width: 200px; /* 固定宽度 */
+    height: 200px; /* 固定高度 */
+    margin-top: 20px; /* 上外边距 */
+    position: sticky; /* 粘性定位 */
+    top: 0; /* 顶部对齐 */
+}
+
+/* 个人资料卡片 */
+.profile, .profile_f {
+    text-align: center; /* 文字居中 */
+    margin-bottom: 2rem; /* 下外边距 */
+    margin-top: 20px; /* 上外边距 */
+    transition: transform 0.3s ease; /* 缩放过渡 */
+}
+
+.profile:hover, .profile_f:hover {
+    transform: scale(1.05); /* 悬停放大 */
+}
+
+.profile .avatar, .profile_f .avatar {
+    width: 120px; /* 头像宽度 */
+    height: 120px; /* 头像高度 */
+    border-radius: 50%; /* 圆形头像 */
+    object-fit: cover; /* 图片填充方式 */
+}
+
+.profile h3, .profile_f h3 {
+    margin-top: 0.5rem; /* 上外边距 */
+    padding-top: 10px; /* 上内边距 */
+    font-size: 20px; /* 字体大小 */
+    margin-bottom: -10px; /* 负下外边距 */
+}
+
+/* 侧边栏导航 */
+.sidebar-nav ul, .sidebar_f-nav ul {
+    list-style: none; /* 移除列表样式 */
+    padding: 0; /* 移除内边距 */
+}
+
+.sidebar-nav ul li, .sidebar_f-nav ul li {
+    margin-bottom: 1rem; /* 下外边距 */
+}
+
+.sidebar-nav ul li a, .sidebar_f-nav ul li a {
+    color: #333; /* 文字颜色 */
+    text-decoration: none; /* 移除下划线 */
+}
+
+/* 社交图标 */
+.social-icons {
+    display: flex; /* 弹性布局 */
+    justify-content: center; /* 水平居中 */
+    gap: 1rem; /* 图标间距 */
+    margin-top: 2rem; /* 上外边距 */
+}
+
+.social-icons a {
+    color: #333; /* 图标颜色 */
+    font-size: 1.5rem; /* 图标大小 */
+}
+
+/* 博客文章区域 */
+.main-page, .main-posts {
+    border-radius: 15px; /* 圆角 */
+    background-color: #fff; /* 背景色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影 */
+    flex: 1; /* 占据剩余空间 */
+    padding: 2rem; /* 内边距 */
+}
+
+.main-page {
+    margin: 20px 0 20px 20px; /* 外边距 */
+}
+
+.main-posts {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* 更强的阴影 */
+}
+
+.main-page h2, .main-posts h1 {
+    margin-top: 0; /* 移除上外边距 */
+    text-align: center; /* 文字居中 */
+}
+
+.main-page p {
+    line-height: 1.6; /* 行高 */
+}
+
+.header-image {
+    width: 100%; /* 图片宽度占满容器 */
+    margin-bottom: 20px; /* 下外边距 */
+    height: auto; /* 自适应高度 */
+    border-radius: 10px; /* 圆角 */
+}
+
+.blog-posts {
+    display: flex; /* 弹性布局 */
+    flex-direction: column; /* 垂直排列 */
+    gap: 2rem; /* 文章间距 */
+    padding-bottom: 5px; /* 下内边距 */
+    margin-bottom: 20px; /* 下外边距 */
+}
+
+.post {
+    position: relative; /* 相对定位 */
+    background: #f4f4f4; /* 背景色 */
+    padding: 1rem; /* 内边距 */
+    border-radius: 10px; /* 圆角 */
+    display: flex; /* 弹性布局 */
+    justify-content: space-between; /* 左右分布 */
+    align-items: center; /* 垂直居中 */
+    gap: 1rem; /* 元素间距 */
+}
+
+.post h2 {
+    margin-top: 0; /* 移除上外边距 */
+}
+
+.post div {
+    order: 0; /* 文字靠左 */
+    flex: 1; /* 占据剩余空间 */
+}
+
+.post img {
+    width: 200px; /* 固定宽度 */
+    height: auto; /* 自适应高度 */
+    border-radius: 10px; /* 圆角 */
+    order: 1; /* 图片靠右 */
+}
+
+.read-more {
+    color: #333; /* 文字颜色 */
+    text-decoration: none; /* 移除下划线 */
+}
+
+.indented {
+    text-indent: 2em; /* 首行缩进 */
+}
