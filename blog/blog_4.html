@@ -9,28 +9,34 @@
     <link rel="icon" type="image/png" href="../img/ico.png">
 </head>
 <body>
- <!-- 主内容区 -->
- <main class="container main-content">
-    <!-- 左侧悬浮块 -->
-    <aside class="sidebar">
-        <div class="profile">
-            <img src="../img/toux.png" alt="" class="avatar">
-            <h3>澳洲白茶</h3>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="../index.html">主页</a></li>
-                <li><a href="../blog.html">博客</a></li>
-                <li><a href="../rsc.html">资源</a></li>
-                <li><a href="../friend.html">友情链接</a></li>
-            </ul>
-        </nav>
-        <div class="social-icons">
-            <a href="https://github.com/aozhoubaicha" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="https://www.zhihu.com" target="_blank"><i class="fab fa-zhihu"></i></a>
-            <a href="https://space.bilibili.com" target="_blank"><i class="fab fa-bilibili"></i></a>
-        </div>
-    </aside>
+    <!-- 主内容区 -->
+    <main class="container main-content">
+        <!-- 左侧栏 -->
+        <aside class="sidebar-container">
+            <div class="sidebar glass-effect">
+                <div class="profile" role="img" aria-label="澳洲白茶个人资料">
+                    <img src="../img/toux.png" alt="头像" class="avatar">
+                    <h3>澳洲白茶</h3>
+                </div>
+                <nav class="sidebar-nav" aria-label="侧边导航">
+                    <ul>
+                        <li><a href="../index.html">主页</a></li>
+                        <li><a href="../blog.html">博客</a></li>
+                        <li><a href="../rsc.html">资源</a></li>
+                        <li><a href="../friend.html">友情链接</a></li>
+                        <li><a href="../about.html">关于</a></li>
+                    </ul>
+                </nav>
+                <div class="social-icons" aria-label="社交媒体链接">
+                    <a href="https://github.com/aozhoubaicha" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="https://www.zhihu.com" target="_blank" aria-label="知乎"><i class="fab fa-zhihu"></i></a>
+                    <a href="https://space.bilibili.com" target="_blank" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+                </div>
+            </div>
+            <footer class="sidebar2">
+                # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
+            </footer>
+        </aside>
 
     <!-- 右侧主内容 -->
         <div class="main-page">
@@ -56,13 +62,6 @@
             </div>
         </div>
 </main>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; Copyright 2024 澳洲白茶</p>
-        </div>
-    </footer>
 
     <!-- 引入JavaScript -->
     <script src="script.js"></script>
