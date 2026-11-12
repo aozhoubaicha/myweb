@@ -17,6 +17,7 @@
             padding: 10px 0;
         }
     </style>
+    <link rel="stylesheet" href="./css/sidebar.css">
 </head>
 <body>
  <!-- 主内容区 -->
@@ -24,15 +25,16 @@
     <!-- 左侧栏 -->
     <aside class="sidebar-container">
         <div class="sidebar">
-            <div class="profile" role="img" aria-label="澳洲白茶个人资料">
-                <img src="./img/toux.png" alt="头像" class="avatar">
+            <div class="profile">
+                <img src="./img/toux.webp" alt="澳洲白茶的头像" class="avatar" width="120" height="120" decoding="async">
                 <h3>澳洲白茶</h3>
+                <p class="role">SINCE 2025</p>
             </div>
             <nav class="sidebar-nav" aria-label="侧边导航">
                 <ul>
                     <li><a href="./index.html">主页</a></li>
                     <li><a href="./blog.html">博客</a></li>
-                    <li><a href="./rsc.html">资源</a></li>
+                    <li><a href="./rsc.html" aria-current="page">资源</a></li>
                     <li><a href="./friend.html">友情链接</a></li>
                     <li><a href="./about.html">关于</a></li>
                 </ul>
@@ -44,7 +46,7 @@
             </div>
         </div>
         <footer class="sidebar2">
-            # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
+            © 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
         </footer>
     </aside>
 
@@ -99,7 +101,6 @@
     </div>
     </section>
 </main>
-    </section>
 
     <!-- 引入JavaScript -->
     <input type="text" id="searchInput" placeholder="输入关键词进行搜索..." aria-label="搜索">

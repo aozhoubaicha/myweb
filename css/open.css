@@ -97,12 +97,35 @@
     }
 }
 
-/* 防止主内容在动画期间滚动 */
-body {
+/* 防止主内容在动画期间滚动：遮罩存在时才锁定，遮罩移除后自动恢复 */
+body:has(.opening-overlay) {
     overflow: hidden;
 }
 
-/* 动画结束后恢复滚动 */
+/* 动画结束后恢复滚动（兼容不支持 :has 的浏览器） */
 body.animation-complete {
     overflow: auto;
+}
+
+/* 距上次播放不足间隔时间：直接跳过开场，避免任何闪烁 */
+html.intro-skip .opening-overlay {
+    display: none;
+}
+
+html.intro-skip body {
+    overflow: auto;
+}
+
+/* 用户偏好减少动态效果：跳过开场动画，直接呈现内容 */
+@media (prefers-reduced-motion: reduce) {
+    .opening-overlay {
+        display: none;
+    }
+
+    .opening-overlay,
+    .title-container,
+    .diamond,
+    .transparent-circle {
+        animation: none;
+    }
 }

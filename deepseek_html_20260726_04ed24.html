@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日推荐 - 今日歌曲</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-serif: 'Noto Serif SC', 'Times New Roman', serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            /* 默认柔和背景色（图片加载前/提取失败时的fallback） */
+            --bg-color: #f0ebe3;
+            --orb-1-color: rgba(210, 180, 160, 0.45);
+            --orb-2-color: rgba(180, 170, 200, 0.4);
+            --orb-3-color: rgba(200, 190, 170, 0.35);
+            --shadow-glow: rgba(160, 140, 120, 0.25);
+            --cover-radius: 20px;
+            --transition-speed: 1.6s;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========== 磨砂光斑层 ========== */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            transition: background-color var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, background-color;
+        }
+
+        .bg-orb--1 {
+            width: 380px;
+            height: 380px;
+            background: var(--orb-1-color);
+            top: -100px;
+            left: -80px;
+            animation: orbFloat1 14s ease-in-out infinite;
+        }
+
+        .bg-orb--2 {
+            width: 300px;
+            height: 300px;
+            background: var(--orb-2-color);
+            bottom: -90px;
+            right: -60px;
+            animation: orbFloat2 16s ease-in-out infinite;
+            animation-delay: -5s;
+        }
+
+        .bg-orb--3 {
+            width: 240px;
+            height: 240px;
+            background: var(--orb-3-color);
+            top: 40%;
+            left: 55%;
+            animation: orbFloat3 12s ease-in-out infinite;
+            animation-delay: -9s;
+            opacity: 0.7;
+        }
+
+        @keyframes orbFloat1 {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(45px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 25px) scale(0.94);
+            }
+        }
+
+        @keyframes orbFloat2 {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            40% {
+                transform: translate(-35px, -20px) scale(1.08);
+            }
+            75% {
+                transform: translate(25px, 30px) scale(0.92);
+            }
+        }
+
+        @keyframes orbFloat3 {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                transform: translate(-30px, -35px) scale(1.12);
+            }
+            85% {
+                transform: translate(15px, 20px) scale(0.96);
+            }
+        }
+
+        /* ========== 主容器 ========== */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ========== 封面框 ========== */
+        .cover-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: var(--cover-radius);
+            position: relative;
+            /* 磨砂玻璃边框效果 */
+            border: 1.5px solid rgba(255, 255, 255, 0.55);
+            box-shadow:
+                0 8px 40px var(--shadow-glow),
+                0 2px 12px rgba(0, 0, 0, 0.06),
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+                0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            overflow: hidden;
+            transition:
+                transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                border-color var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+            background: #000;
+        }
+
+        .cover-wrapper:hover {
+            transform: translateY(-5px) scale(1.015);
+            box-shadow:
+                0 16px 56px var(--shadow-glow),
+                0 4px 20px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.35) inset,
+                0 1px 0 rgba(255, 255, 255, 0.55) inset;
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cover-wrapper:active {
+            transform: translateY(-2px) scale(1.005);
+            transition: transform 0.15s ease;
+        }
+
+        /* 封面图片容器 */
+        .cover-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--cover-radius);
+            overflow: hidden;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: var(--cover-radius);
+        }
+
+        /* 底部渐变遮罩 */
+        .cover-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 0.5) 0%,
+                    rgba(0, 0, 0, 0.12) 32%,
+                    rgba(0, 0, 0, 0.0) 58%);
+            pointer-events: none;
+            border-radius: var(--cover-radius);
+        }
+
+        /* 封面上的歌曲名 */
+        .cover-title {
+            position: absolute;
+            bottom: 26px;
+            left: 26px;
+            right: 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .cover-title__chinese {
+            font-family: var(--font-serif);
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.05em;
+            line-height: 1.15;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .cover-title__sub {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.82);
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+        }
+
+        /* ========== 隐藏的canvas用于取色 ========== */
+        .color-extractor-canvas {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+            left: -9999px;
+            top: -9999px;
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 460px) {
+            body {
+                padding: 18px;
+                align-items: flex-start;
+                padding-top: 40px;
+            }
+            .main-container {
+                max-width: 100%;
+            }
+            .cover-title {
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+            }
+            .cover-title__chinese {
+                font-size: 1.7rem;
+            }
+            .cover-title__sub {
+                font-size: 0.8rem;
+            }
+            .bg-orb--1 {
+                width: 260px;
+                height: 260px;
+                top: -70px;
+                left: -60px;
+            }
+            .bg-orb--2 {
+                width: 220px;
+                height: 220px;
+                bottom: -60px;
+                right: -50px;
+            }
+            .bg-orb--3 {
+                width: 170px;
+                height: 170px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 磨砂光斑 -->
+    <div class="bg-orbs">
+        <div class="bg-orb bg-orb--1"></div>
+        <div class="bg-orb bg-orb--2"></div>
+        <div class="bg-orb bg-orb--3"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <main class="main-container">
+        <!-- 封面框 -->
+        <div class="cover-wrapper" id="coverWrapper">
+            <div class="cover-image-container">
+                <img
+                id="coverImage"
+                class="cover-image"
+                src="http://i1.hdslb.com/bfs/archive/ba5bb8d42401e703b9d3f679508b31ea5235e737.jpg"
+                alt="歌曲封面"
+                loading="eager"
+                crossorigin="anonymous"
+                />
+                <div class="cover-overlay"></div>
+                <h1 class="cover-title">
+                    <span class="cover-title__chinese">精神电锯</span>
+                    <span class="cover-title__sub">かいりきベア</span>
+                </h1>
+            </div>
+        </div>
+    </main>
+
+    <!-- 隐藏canvas用于颜色提取 -->
+    <canvas class="color-extractor-canvas" id="colorCanvas" width="60" height="60"></canvas>
+
+    <script>
+        (function() {
+            const img = document.getElementById('coverImage');
+            const canvas = document.getElementById('colorCanvas');
+            const ctx = canvas.getContext('2d');
+            const root = document.documentElement;
+
+            // 默认柔和暖色（fallback）
+            const defaultColors = {
+                bg: '#f0ebe3',
+                orb1: 'rgba(210,180,160,0.45)',
+                orb2: 'rgba(180,170,200,0.4)',
+                orb3: 'rgba(200,190,170,0.35)',
+                shadow: 'rgba(160,140,120,0.25)',
+            };
+
+            /**
+             * RGB 转 HSL
+             */
+            function rgbToHsl(r, g, b) {
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+
+                if (max === min) {
+                    h = s = 0;
+                } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                            break;
+                        case g:
+                            h = ((b - r) / d + 2) / 6;
+                            break;
+                        case b:
+                            h = ((r - g) / d + 4) / 6;
+                            break;
+                    }
+                }
+                return { h: h * 360, s: s * 100, l: l * 100 };
+            }
+
+            /**
+             * HSL 转 RGB 字符串
+             */
+            function hslToRgbString(h, s, l, a = 1) {
+                s /= 100;
+                l /= 100;
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+                const m = l - c / 2;
+                let r, g, b;
+                if (h < 60) { r = c;
+                    g = x;
+                    b = 0; } else if (h < 120) { r = x;
+                    g = c;
+                    b = 0; } else if (h < 180) { r = 0;
+                    g = c;
+                    b = x; } else if (h < 240) { r = 0;
+                    g = x;
+                    b = c; } else if (h < 300) { r = x;
+                    g = 0;
+                    b = c; } else { r = c;
+                    g = 0;
+                    b = x; }
+                r = Math.round((r + m) * 255);
+                g = Math.round((g + m) * 255);
+                b = Math.round((b + m) * 255);
+                return `rgba(${r},${g},${b},${a})`;
+            }
+
+            /**
+             * 从图片提取平均颜色
+             */
+            function extractAverageColor(imageElement) {
+                try {
+                    // 绘制缩小版图片到canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+
+                    // 获取像素数据
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
+                    const pixelCount = pixels.length / 4;
+
+                    // 采样策略：跳过过于透明和极端的像素
+                    let totalR = 0,
+                        totalG = 0,
+                        totalB = 0,
+                        validPixels = 0;
+
+                    // 采样步长（每隔几个像素采样，提高性能并避免噪点）
+                    const step = 2;
+                    for (let i = 0; i < pixels.length; i += 4 * step) {
+                        const r = pixels[i];
+                        const g = pixels[i + 1];
+                        const b = pixels[i + 2];
+                        const a = pixels[i + 3];
+
+                        // 跳过太透明或太暗/太亮的像素
+                        if (a < 100) continue;
+                        const brightness = (r + g + b) / 3;
+                        if (brightness < 15 || brightness > 245) continue;
+
+                        totalR += r;
+                        totalG += g;
+                        totalB += b;
+                        validPixels++;
+                    }
+
+                    // 如果有效像素太少，回退到全部像素平均
+                    if (validPixels < 50) {
+                        totalR = 0;
+                        totalG = 0;
+                        totalB = 0;
+                        validPixels = 0;
+                        for (let i = 0; i < pixels.length; i += 4) {
+                            totalR += pixels[i];
+                            totalG += pixels[i + 1];
+                            totalB += pixels[i + 2];
+                            validPixels++;
+                        }
+                    }
+
+                    if (validPixels === 0) return null;
+
+                    const avgR = Math.round(totalR / validPixels);
+                    const avgG = Math.round(totalG / validPixels);
+                    const avgB = Math.round(totalB / validPixels);
+
+                    return { r: avgR, g: avgG, b: avgB };
+                } catch (e) {
+                    // canvas被污染（跨域问题）时回退
+                    console.warn('无法提取封面颜色（可能由于跨域限制），使用默认配色。', e.message);
+                    return null;
+                }
+            }
+
+            /**
+             * 应用颜色到CSS变量
+             */
+            function applyColors(imageElement) {
+                const extracted = extractAverageColor(imageElement);
+
+                if (!extracted) {
+                    // 使用默认颜色
+                    root.style.setProperty('--bg-color', defaultColors.bg);
+                    root.style.setProperty('--orb-1-color', defaultColors.orb1);
+                    root.style.setProperty('--orb-2-color', defaultColors.orb2);
+                    root.style.setProperty('--orb-3-color', defaultColors.orb3);
+                    root.style.setProperty('--shadow-glow', defaultColors.shadow);
+                    return;
+                }
+
+                const { r, g, b } = extracted;
+                const hsl = rgbToHsl(r, g, b);
+
+                // 背景色：保持色相，降低饱和度，调整亮度至柔和范围
+                const bgSaturation = Math.min(hsl.s * 0.55, 35);
+                const bgLightness = Math.max(68, Math.min(84, hsl.l * 0.85 + 18));
+                const bgColor = hslToRgbString(hsl.h, bgSaturation, bgLightness);
+
+                // 光斑1：稍高饱和度，略亮
+                const orb1S = Math.min(hsl.s * 0.75, 50);
+                const orb1L = Math.max(65, Math.min(82, bgLightness + 2));
+                const orb1Color = hslToRgbString(hsl.h, orb1S, orb1L, 0.45);
+
+                // 光斑2：色相偏移30度，柔和
+                const orb2H = (hsl.h + 35) % 360;
+                const orb2S = Math.min(hsl.s * 0.6, 42);
+                const orb2L = Math.max(62, Math.min(80, bgLightness - 2));
+                const orb2Color = hslToRgbString(orb2H, orb2S, orb2L, 0.4);
+
+                // 光斑3：色相偏移-25度
+                const orb3H = (hsl.h - 25 + 360) % 360;
+                const orb3S = Math.min(hsl.s * 0.5, 38);
+                const orb3L = Math.max(64, Math.min(83, bgLightness + 4));
+                const orb3Color = hslToRgbString(orb3H, orb3S, orb3L, 0.35);
+
+                // 阴影光晕：主色深色半透明版本
+                const shadowS = Math.min(hsl.s * 0.6, 40);
+                const shadowL = Math.max(25, Math.min(45, hsl.l * 0.5));
+                const shadowColor = hslToRgbString(hsl.h, shadowS, shadowL, 0.28);
+
+                // 应用CSS变量
+                root.style.setProperty('--bg-color', bgColor);
+                root.style.setProperty('--orb-1-color', orb1Color);
+                root.style.setProperty('--orb-2-color', orb2Color);
+                root.style.setProperty('--orb-3-color', orb3Color);
+                root.style.setProperty('--shadow-glow', shadowColor);
+            }
+
+            /**
+             * 初始化颜色提取
+             */
+            function initColorExtraction() {
+                if (img.complete && img.naturalWidth > 0) {
+                    // 图片已加载
+                    applyColors(img);
+                } else {
+                    // 等待加载
+                    img.addEventListener('load', function() {
+                        applyColors(img);
+                    }, { once: true });
+                }
+
+                // 处理加载错误
+                img.addEventListener('error', function() {
+                    console.warn('封面图片加载失败，使用默认配色。');
+                    root.style.setProperty('--bg-color', defaultColors.bg);
+                    root.style.setProperty('--orb-1-color', defaultColors.orb1);
+                    root.style.setProperty('--orb-2-color', defaultColors.orb2);
+                    root.style.setProperty('--orb-3-color', defaultColors.orb3);
+                    root.style.setProperty('--shadow-glow', defaultColors.shadow);
+                }, { once: true });
+            }
+
+            // 启动
+            initColorExtraction();
+        })();
+    </script>
+</body>
+</html>

@@ -4,37 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>乱动之大图书馆</title>
+    <meta name="description" content="澳洲白茶的个人网站：主页、博客、资源与友情链接。">
+    <meta name="theme-color" content="#d9e4f5">
+    <link rel="canonical" href="https://anzhoubai.vip/">
+
+    <!-- 开场动画：一段时间内只播一次（默认 24 小时） -->
+    <script>
+        (function () {
+            var key = 'dgt:intro:last';
+            var ttl = 24 * 60 * 60 * 1000;
+            window.DGT_INTRO = { key: key, ttl: ttl, skip: false };
+            try {
+                var last = parseInt(localStorage.getItem(key) || '0', 10);
+                if (last && Date.now() - last < ttl) {
+                    document.documentElement.className += ' intro-skip';
+                    window.DGT_INTRO.skip = true;
+                }
+            } catch (e) {
+                /* 隐私模式下读不到 storage 就按“播放”处理 */
+            }
+        })();
+    </script>
+
+    <!-- 样式 -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="./css/global.css">
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/animations.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <link rel="stylesheet" href="./css/open.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/png" href="./img/ico.png">
+
+    <!-- 无 JS 时的兜底：隐藏开场遮罩、直接展示标题、恢复滚动 -->
+    <noscript>
+        <style>
+            .fadetext { opacity: 1; }
+            .opening-overlay { display: none; }
+            body { overflow: auto; }
+        </style>
+    </noscript>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PSEF2690CE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-PSEF2690CE');
+    </script>
+    <link rel="stylesheet" href="./css/sidebar.css">
 </head>
 <body>
-<!-- 开场动画遮罩层 -->
-<div class="opening-overlay">
-    <div class="title-container">
-        <h1 class="title-main">乱动的大图书馆</h1>
-        <p class="title-sub">The Great Library of Immobility</p>
+    <!-- 开场动画遮罩层（纯装饰） -->
+    <div class="opening-overlay" aria-hidden="true">
+        <div class="title-container">
+            <h1 class="title-main">乱动的大图书馆</h1>
+            <p class="title-sub">The Great Library of Immobility</p>
+        </div>
+        <div class="diamond"></div>
+        <div class="transparent-circle"></div>
     </div>
-    <div class="diamond"></div> <!-- 添加长菱形 -->
-    <div class="transparent-circle"></div>
-</div>
+
     <!-- 主内容区 -->
-    <main class="container main-content">
+    <main class="container main-content" id="main">
         <!-- 左侧栏 -->
-        <aside class="sidebar-container">
+        <aside class="sidebar-container" aria-label="侧边栏">
             <div class="sidebar glass-effect">
-                <div class="profile" role="img" aria-label="澳洲白茶个人资料">
-                    <img src="./img/toux.png" alt="头像" class="avatar">
+                <div class="profile">
+                    <img src="./img/toux.webp" alt="澳洲白茶的头像" class="avatar" width="120" height="120" decoding="async">
                     <h3>澳洲白茶</h3>
+                    <p class="role">SINCE 2025</p>
                 </div>
                 <nav class="sidebar-nav" aria-label="侧边导航">
                     <ul>
-                        <li><a href="./index.html">主页</a></li>
+                        <li><a href="./index.html" aria-current="page">主页</a></li>
                         <li><a href="./blog.html">博客</a></li>
                         <li><a href="./rsc.html">资源</a></li>
                         <li><a href="./friend.html">友情链接</a></li>
@@ -42,45 +88,34 @@
                     </ul>
                 </nav>
                 <div class="social-icons" aria-label="社交媒体链接">
-                    <a href="https://github.com/aozhoubaicha" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="https://www.zhihu.com" target="_blank" aria-label="知乎"><i class="fab fa-zhihu"></i></a>
-                    <a href="https://space.bilibili.com" target="_blank" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+                    <a href="https://github.com/aozhoubaicha" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+                    <a href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer" aria-label="知乎"><i class="fab fa-zhihu" aria-hidden="true"></i></a>
+                    <a href="https://space.bilibili.com" target="_blank" rel="noopener noreferrer" aria-label="哔哩哔哩"><i class="fab fa-bilibili" aria-hidden="true"></i></a>
                 </div>
             </div>
             <footer class="sidebar2">
-                # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
+                © 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
             </footer>
         </aside>
 
-    <!-- 右侧内容 -->
-    <section class="floatbox">
-        <article class="main-page">
-            <h2><p class="fadetext">信仰是为了虚妄之人</p></h2>
-            <div class="fade-in">
-                <img src="./img/bizhi.jpg" alt="头图" class="header-image">
-            </div>
-        </article>
-    </section>
-    
-</main>
+        <!-- 右侧内容 -->
+        <section class="floatbox">
+            <article class="main-page">
+                <h2 class="fadetext">信仰是为了虚妄之人</h2>
+                <div class="fade-in">
+                    <picture>
+                        <source type="image/webp"
+                                srcset="./img/bizhi-1280.webp 1280w, ./img/bizhi-1920.webp 1920w"
+                                sizes="(max-width: 768px) 100vw, 80vw">
+                        <img src="./img/bizhi.jpg" alt="乱动之大图书馆头图" class="header-image"
+                             width="3840" height="2160" decoding="async" fetchpriority="high">
+                    </picture>
+                </div>
+            </article>
+        </section>
+    </main>
 
     <!-- 引入JavaScript -->
     <script src="scripts/main.js"></script>
 </body>
 </html>
-
-<script>
-    window.onload = function() {
-        document.querySelector('.fadetext').classList.add('active');
-    };
-</script>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PSEF2690CE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-PSEF2690CE');
-</script>

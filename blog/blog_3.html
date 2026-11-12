@@ -3,64 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日常的第三篇</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="theme-color" content="#d9e4f5">
+    <title>日常的第三篇 · 大图书馆存档</title>
+    <meta name="description" content="步入日常之后的日记...">
+    <link rel="canonical" href="https://anzhoubai.vip/blog/blog_3.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="日常的第三篇">
+    <meta property="og:site_name" content="大图书馆存档">
+    <meta property="og:description" content="步入日常之后的日记...">
+    <meta property="og:image" content="https://anzhoubai.vip/img/blog/cover-blog_3.webp">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/blog.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/png" href="../img/ico.png">
 </head>
-<body>
- <!-- 主内容区 -->
- <main class="container main-content">
-    <!-- 左侧悬浮块 -->
-    <aside class="sidebar">
+<body class="page-post">
+<main class="container main-content">
+<aside class="sidebar-container" aria-label="侧边栏">
+    <div class="sidebar glass-effect">
         <div class="profile">
-            <img src="../img/toux.png" alt="" class="avatar">
+            <img src="../img/toux.webp" alt="澳洲白茶的头像" class="avatar"
+                 width="120" height="120" decoding="async">
             <h3>澳洲白茶</h3>
+            <p class="role">SINCE 2025</p>
         </div>
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="侧边导航">
             <ul>
-                <li><a href="../index.html">主页</a></li>
-                <li><a href="../blog.html">博客</a></li>
-                <li><a href="../rsc.html">资源</a></li>
-                <li><a href="../friend.html">友情链接</a></li>
+                        <li><a href="../index.html">主页</a></li>
+                        <li><a href="../blog.html" aria-current="page">博客</a></li>
+                        <li><a href="../rsc.html">资源</a></li>
+                        <li><a href="../friend.html">友情链接</a></li>
+                        <li><a href="../about.html">关于</a></li>
             </ul>
         </nav>
-        <div class="social-icons">
-            <a href="https://github.com/aozhoubaicha" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="https://www.zhihu.com" target="_blank"><i class="fab fa-zhihu"></i></a>
-            <a href="https://space.bilibili.com" target="_blank"><i class="fab fa-bilibili"></i></a>
+        <div class="social-icons" aria-label="社交媒体链接">
+            <a href="https://github.com/aozhoubaicha" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+            <a href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer" aria-label="知乎"><i class="fab fa-zhihu" aria-hidden="true"></i></a>
+            <a href="https://space.bilibili.com" target="_blank" rel="noopener noreferrer" aria-label="哔哩哔哩"><i class="fab fa-bilibili" aria-hidden="true"></i></a>
         </div>
-    </aside>
-
-    <!-- 右侧主内容 -->
-        <div class="main-page">
-            <div class="content">
-                <h2>日常的第三篇</h2>
-                <img src="../img/bg2.png" alt="头图" class="header-image">
-                <p class="indented" style="line-height: 2.5">  有一说一倒腾网站前端的还是挺痛苦的，折腾几小时才能搞出来一点看着像人样的小改动，而且还有各种适配bug
-                    所以说能写简洁明了少修改的css确实算个高手
-                </p>
-                <p>  上次提到的绩点最终是只要3.22的完蛋地步了（我自认为的，应为这byd绩点还能超过78%的人拿奖学金无敌了）...希望转专业能成功吧....<br/>
-                      寒假居然一个人突袭了北上广深四座城市，体验了各个城市的，文化吗？总之希望未来的我有一天整理下能在网站播视频吧<br/>
-                      新的学期已经开始一周...然而我还沉迷于各种不可言说的事务或是电子阳痿...呵呵呵<br/>
-                      哦对了，我参与的波兰球社群波通社最终是爆炸了，爆了呃...一地文件？应该整理整理塞网站里的，希望我哪天闲的xx的时候干点人事吧
-                    总而言之网站还要很多bug...祈祷下次见
-                </p>
-                <p>  于2025/3/1深夜（希望下次不要手动加盖时间戳）</p>
-                <p>  已经修复了大部分bug 感谢grok ai </p>
-
-            </div>
-        </div>
-</main>
-
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; Copyright 2024 澳洲白茶</p>
-        </div>
+    </div>
+    <footer class="sidebar2">
+        © 2025 <a href="../about.html">澳洲白茶</a>
     </footer>
-
-    <!-- 引入JavaScript -->
-    <script src="script.js"></script>
+</aside>
+<section class="main-page post-page">
+    <div class="post-inner">
+        <a class="back" href="../blog.html"><span aria-hidden="true">←</span> 返回存档</a>
+        <p class="kicker"><time datetime="2025-03-01">2025 / 03 / 01</time><span class="sep">·</span><span>随笔</span></p>
+        <h1 class="post-title">日常的第三篇</h1>
+        <p class="lede">步入日常之后的日记...</p>
+        <figure class="hero"><img src="../img/blog/cover-blog_3.webp" alt="" loading="eager" decoding="async" fetchpriority="high"></figure>
+        <article class="prose">
+<p>有一说一倒腾网站前端的还是挺痛苦的，折腾几小时才能搞出来一点看着像人样的小改动，而且还有各种适配 bug。所以说能写简洁明了少修改的 css 确实算个高手。</p>
+<p>上次提到的绩点最终是只要 3.22 的完蛋地步了（我自认为的，应为这 byd 绩点还能超过 78% 的人拿奖学金无敌了）...希望转专业能成功吧....</p>
+<p>寒假居然一个人突袭了北上广深四座城市，体验了各个城市的，文化吗？总之希望未来的我有一天整理下能在网站播视频吧。</p>
+<p>新的学期已经开始一周...然而我还沉迷于各种不可言说的事务或是电子阳痿...呵呵呵。</p>
+<p>哦对了，我参与的波兰球社群波通社最终是爆炸了，爆了呃...一地文件？应该整理整理塞网站里的，希望我哪天闲的 xx 的时候干点人事吧。</p>
+<p>总而言之网站还要很多 bug...祈祷下次见。</p>
+<blockquote><p>于 2025 / 3 / 1 深夜（希望下次不要手动加盖时间戳）</p></blockquote>
+<p>已经修复了大部分 bug，感谢 grok ai。</p>
+        </article>
+        <div class="post-foot">
+            <a class="back" href="../blog.html">← 返回存档</a>
+        </div>
+    </div>
+</section>
+</main>
 </body>
 </html>

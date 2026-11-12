@@ -1,0 +1,343 @@
+/* ==========================================================================
+   侧边栏 · 玻璃版（B 方案）
+   所有页面共用：index / blog / rsc / friend / about
+   本文件最后加载，用更高优先级覆盖 components.css、styles.css 里的旧侧栏规则
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   容器与卡片
+   -------------------------------------------------------------------------- */
+.sidebar-container {
+    width: 220px;
+    gap: 10px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+
+.sidebar-container .sidebar {
+    position: static;
+    top: auto;
+    box-sizing: border-box;
+    width: 220px;
+    height: auto;
+    padding: 26px 18px 18px;
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+    backdrop-filter: blur(18px) saturate(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    box-shadow: 0 26px 55px -40px rgba(31, 45, 73, 0.6),
+                0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    transition: box-shadow 0.3s ease;
+}
+
+/* 整块不再位移，避免鼠标扫过时跳动 */
+.sidebar-container:hover {
+    transform: none;
+}
+
+.sidebar-container:hover .sidebar {
+    box-shadow: 0 30px 60px -38px rgba(31, 45, 73, 0.7),
+                0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+/* --------------------------------------------------------------------------
+   头像与名字
+   -------------------------------------------------------------------------- */
+.sidebar-container .profile {
+    margin: 0 0 18px;
+    text-align: center;
+    transition: none;
+}
+
+.sidebar-container .profile:hover {
+    transform: none;
+}
+
+.sidebar-container .profile .avatar {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7),
+                0 14px 26px -18px rgba(0, 0, 0, 0.55);
+}
+
+.sidebar-container .profile h3 {
+    margin: 16px 0 2px;
+    padding: 0;
+    font-family: "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif SC", "SimSun", Georgia, serif;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: #1a2438;
+}
+
+.sidebar-container .profile .role {
+    margin: 0 0 18px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: #6f7d93;
+    text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   导航（胶囊）
+   -------------------------------------------------------------------------- */
+.sidebar-container .sidebar-nav {
+    display: block;
+    padding: 0;
+    background: none;
+}
+
+.sidebar-container .sidebar-nav ul {
+    display: grid;
+    gap: 3px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: static;
+}
+
+.sidebar-container .sidebar-nav ul li {
+    margin: 0;
+    position: static;
+}
+
+.sidebar-container .sidebar-nav ul li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #35435c;
+    font-size: 13.5px;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    position: static;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.sidebar-container .sidebar-nav ul li a:hover {
+    background: rgba(255, 255, 255, 0.75);
+    color: #1a2438;
+    transform: translateX(2px);
+}
+
+.sidebar-container .sidebar-nav ul li a[aria-current="page"] {
+    background: #fff;
+    color: #1a2438;
+    box-shadow: 0 3px 10px -6px rgba(20, 30, 50, 0.45);
+}
+
+.sidebar-container .sidebar-nav ul li a:focus-visible,
+.sidebar-container .social-icons a:focus-visible,
+.sidebar-container .sidebar2 a:focus-visible {
+    outline: 2px solid #9c3d2e;
+    outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   社交图标
+   -------------------------------------------------------------------------- */
+.sidebar-container .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.sidebar-container .social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    color: #5d6b82;
+    font-size: 15px;
+    opacity: 0.62;
+    transition: opacity 0.25s ease, color 0.25s ease;
+}
+
+.sidebar-container .social-icons a:hover {
+    opacity: 1;
+    color: #9c3d2e;
+}
+
+/* --------------------------------------------------------------------------
+   页脚：从独立浮块降级为卡片下的一行说明
+   -------------------------------------------------------------------------- */
+.sidebar-container .sidebar2 {
+    position: static;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0 4px;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    color: #7c879a;
+}
+
+.sidebar-container .sidebar2 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.sidebar-container .sidebar2 a:hover {
+    color: #9c3d2e;
+}
+
+/* --------------------------------------------------------------------------
+   移动端：侧栏压成一条紧凑头部
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    /* 侧栏压成一条悬浮胶囊导航条 */
+    .sidebar-container {
+        position: fixed;
+        top: 10px;
+        left: 12px;
+        right: 12px;
+        z-index: 50;
+        width: auto;
+        max-width: 720px;
+        margin: 0 auto;
+        gap: 0;
+    }
+
+    /* 给悬浮条留出位置 */
+    .main-content {
+        padding-top: 74px;
+    }
+
+    /* 手机上内容从顶部开始，不再垂直居中 */
+    .container {
+        margin-top: 0;
+    }
+
+    .sidebar-container .sidebar {
+        position: static;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 7px 10px;
+        border-radius: 999px;
+    }
+
+    .sidebar-container .profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+        margin: 0;
+        text-align: left;
+    }
+
+    .sidebar-container .profile .avatar {
+        width: 30px;
+        height: 30px;
+        box-shadow: 0 0 0 2px #fff;
+    }
+
+    .sidebar-container .profile h3 {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+    }
+
+    .sidebar-container .profile .role {
+        display: none;
+    }
+
+    .sidebar-container .sidebar-nav {
+        flex: 1 1 auto;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .sidebar-container .sidebar-nav ul {
+        display: flex;
+        gap: 2px;
+        overflow-x: auto;
+        padding: 0;
+        scrollbar-width: none;
+    }
+
+    .sidebar-container .sidebar-nav ul::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-container .sidebar-nav ul li {
+        flex: 0 0 auto;
+    }
+
+    .sidebar-container .sidebar-nav ul li a {
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: #35435c;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        transform: none;
+    }
+
+    .sidebar-container .sidebar-nav ul li a:hover {
+        background: rgba(255, 255, 255, 0.75);
+        transform: none;
+    }
+
+    .sidebar-container .sidebar-nav ul li a[aria-current="page"] {
+        background: #1c1a17;
+        border-color: #1c1a17;
+        color: #f6f3ec;
+        box-shadow: none;
+    }
+
+    .sidebar-container .social-icons {
+        position: static;
+        flex: 0 0 auto;
+        margin: 0 2px 0 0;
+        gap: 4px;
+    }
+
+    .sidebar-container .social-icons a {
+        padding: 2px;
+        font-size: 13px;
+    }
+
+    .sidebar-container .sidebar2 {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-container .profile h3 {
+        display: none;
+    }
+}
+
+/* 窄屏优先保证 5 个导航项都能放下 */
+@media (max-width: 400px) {
+    .sidebar-container .social-icons {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-container .sidebar,
+    .sidebar-container .sidebar-nav ul li a,
+    .sidebar-container .social-icons a {
+        transition: none;
+    }
+
+    .sidebar-container .sidebar-nav ul li a:hover {
+        transform: none;
+    }
+}

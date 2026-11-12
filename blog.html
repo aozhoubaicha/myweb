@@ -3,81 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大图书馆存档</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="theme-color" content="#d9e4f5">
+    <title>大图书馆存档 · 澳洲白茶</title>
+    <meta name="description" content="澳洲白茶的写作存档：日记、随笔与旅行记录。">
+    <link rel="canonical" href="https://anzhoubai.vip/blog.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="大图书馆存档">
+    <meta property="og:site_name" content="大图书馆存档">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="./css/global.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/blog.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/png" href="./img/ico.png">
 </head>
-<body>
-    <!-- 主内容区 -->
-    <main class="container main-content">
-        <!-- 左侧栏容器 -->
-        <div class="sidebar-container">
-            <!-- 左侧悬浮块 -->
-            <div class="sidebar">
-                <div class="profile">
-                    <img src="./img/toux.png" alt="" class="avatar">
-                    <h3>澳洲白茶</h3>
-                </div>
-                <nav class="sidebar-nav">
-                    <ul>
+<body class="page-archive">
+<main class="container main-content">
+<aside class="sidebar-container" aria-label="侧边栏">
+    <div class="sidebar glass-effect">
+        <div class="profile">
+            <img src="./img/toux.webp" alt="澳洲白茶的头像" class="avatar"
+                 width="120" height="120" decoding="async">
+            <h3>澳洲白茶</h3>
+            <p class="role">SINCE 2025</p>
+        </div>
+        <nav class="sidebar-nav" aria-label="侧边导航">
+            <ul>
                         <li><a href="./index.html">主页</a></li>
-                        <li><a href="./blog.html">博客</a></li>
+                        <li><a href="./blog.html" aria-current="page">博客</a></li>
                         <li><a href="./rsc.html">资源</a></li>
                         <li><a href="./friend.html">友情链接</a></li>
                         <li><a href="./about.html">关于</a></li>
-                    </ul>
-                </nav>
-                <div class="social-icons">
-                    <a href="https://github.com/aozhoubaicha" target="_blank"><i class="fab fa-github"></i></a>
-                    <a href="https://www.zhihu.com" target="_blank"><i class="fab fa-zhihu"></i></a>
-                    <a href="https://space.bilibili.com" target="_blank"><i class="fab fa-bilibili"></i></a>
-                </div>
-            </div>
-            <!-- 页脚 -->
-            <div class="sidebar2">
-                # 2025 <a href="./about.html" style="color: rgb(0, 0, 0);text-decoration: none;">澳洲白茶</a>
-            </div>
+            </ul>
+        </nav>
+        <div class="social-icons" aria-label="社交媒体链接">
+            <a href="https://github.com/aozhoubaicha" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+            <a href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer" aria-label="知乎"><i class="fab fa-zhihu" aria-hidden="true"></i></a>
+            <a href="https://space.bilibili.com" target="_blank" rel="noopener noreferrer" aria-label="哔哩哔哩"><i class="fab fa-bilibili" aria-hidden="true"></i></a>
         </div>
-
-        <!-- 右侧主内容 -->
-        <section class="main-posts">
-            <h1>大图书馆存档</h1>
-            <div class="blog-posts">
-                <article class="post">
-                    <div>
-                        <h2><a href="./blog/blog_4.html" class="read-more">不尽如人意的周四</a></h2>
-                        <p>好想成为人类啊...或者是成为大人物啊...去想去的地方发光发热...</p>
-                    </div>
-                    <img src="./img/AZB_3492.webp" alt="">
-                </article>
-                <article class="post">
-                    <div>
-                        <h2><a href="./blog/blog_3.html" class="read-more">日常的第三篇</a></h2>
-                        <p>步入日常之后的日记...</p>
-                    </div>
-                    <img src="./img/bg2.png" alt="">
-                </article>
-                <article class="post">
-                    <div>
-                        <h2><a href="./blog/blog_2.html" class="read-more">芜杂的第二篇</a></h2>
-                        <p>期末考试前完蛋宣言...</p>
-                    </div>
-                    <img src="./img/bg10.png" alt="">
-                </article>
-                <div class="post">
-                    <div>
-                        <h2><a href="./blog/blog_1.html" class="read-more">故事开始的第一篇</a></h2>
-                        <p>关于开始，以及其他...</p>
-                    </div>
-                    <img src="./img/bizhi.jpg" alt="">
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- 引入JavaScript -->
-    <script src="script.js"></script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91a0678b19f07b99',t:'MTc0MDkxMzM3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    </div>
+    <footer class="sidebar2">
+        © 2025 <a href="./about.html">澳洲白茶</a>
+    </footer>
+</aside>
+<section class="main-posts">
+    <header class="archive-head">
+        <h1>大图书馆存档</h1>
+        <p class="sub">THE GREAT LIBRARY · ARCHIVE</p>
+    </header>
+    <p class="archive-note">共 5 篇 · 按时间倒序</p>
+    <ol class="entries">
+        <li class="entry">
+            <a href="./blog/blog_5.html">
+                <span class="no">05</span>
+                <span class="body">
+                    <span class="t">暑假以来的若干总结</span>
+                    <span class="s">撰写一些小内容...</span>
+                    <span class="meta">2025.09.07</span>
+                </span>
+                <img class="thumb" src="./img/blog/cover-azb.webp" alt="" width="112" height="112" loading="lazy" decoding="async">
+            </a>
+        </li>
+        <li class="entry">
+            <a href="./blog/blog_4.html">
+                <span class="no">04</span>
+                <span class="body">
+                    <span class="t">不尽如人意的周四</span>
+                    <span class="s">好想成为人类啊...或者是成为大人物啊...去想去的地方发光发热...</span>
+                    <span class="meta">2025.05.17</span>
+                </span>
+                <img class="thumb" src="./img/blog/cover-azb.webp" alt="" width="112" height="112" loading="lazy" decoding="async">
+            </a>
+        </li>
+        <li class="entry">
+            <a href="./blog/blog_3.html">
+                <span class="no">03</span>
+                <span class="body">
+                    <span class="t">日常的第三篇</span>
+                    <span class="s">步入日常之后的日记...</span>
+                    <span class="meta">2025.03.01</span>
+                </span>
+                <img class="thumb" src="./img/blog/cover-blog_3.webp" alt="" width="112" height="112" loading="lazy" decoding="async">
+            </a>
+        </li>
+        <li class="entry">
+            <a href="./blog/blog_2.html">
+                <span class="no">02</span>
+                <span class="body">
+                    <span class="t">芜杂的第二篇</span>
+                    <span class="s">期末考试前完蛋宣言...</span>
+                    <span class="meta">2025.01.05</span>
+                </span>
+                <img class="thumb" src="./img/blog/cover-blog_2.webp" alt="" width="112" height="112" loading="lazy" decoding="async">
+            </a>
+        </li>
+        <li class="entry">
+            <a href="./blog/blog_1.html">
+                <span class="no">01</span>
+                <span class="body">
+                    <span class="t">故事开始的第一篇</span>
+                    <span class="s">关于开始，以及其他...</span>
+                    <span class="meta">2025.01.02</span>
+                </span>
+                <img class="thumb" src="./img/blog/cover-blog_1.webp" alt="" width="112" height="112" loading="lazy" decoding="async">
+            </a>
+        </li>
+        </ol>
+</section>
+</main>
 </body>
 </html>

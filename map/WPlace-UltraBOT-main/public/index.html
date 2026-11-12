@@ -1,0 +1,4292 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WPlace UltraBOT</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <style>
+    :root { color-scheme: dark light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #ffffff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      color: #e5e7eb;
+    }
+    #c {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      
+      display: block;
+      background: #ffffff;
+      cursor: grab;
+      z-index: 0;
+    }
+    body.dragging #c { cursor: grabbing; }
+    .panel {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 20, 24, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+      z-index: 1000;
+    }
+    label { font-size: 14px; }
+    input {
+      width: 100px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.25);
+      color: #e5e7eb;
+      outline: none;
+    }
+    button {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.35);
+      color: #e5e7eb;
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      font: inherit;
+      line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    button:hover { background: rgba(255,255,255,0.08); }
+    .app-btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.35);
+      color: #e5e7eb;
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      font: inherit;
+      line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .app-btn:hover { background: rgba(255,255,255,0.08); }
+    .app-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #btn-account-cancel.app-btn, #btn-account-save.app-btn {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+    .url {
+      position: fixed;
+      bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.45);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      word-break: break-all;
+      z-index: 1000;
+    }
+    #sign {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 500;
+      user-select: none;
+      pointer-events: auto;
+      image-rendering: pixelated;
+      background: rgba(0,0,0,0.0);
+      transform-origin: top left;
+      will-change: transform;
+    }
+    #sign[hidden] { display: none; }
+    #sign-outline {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      border: 2px dashed #22d3ee;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.7);
+    }
+    #sign-outline[hidden] { display: none; }
+    #sign-layer { position: fixed; left: 0; top: 0; z-index: 600; pointer-events: none; }
+    .pixel-marker {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 1300;
+    }
+    .pixel-marker[hidden] { display: none; }
+    body.dragging-sign #sign { cursor: grabbing; }
+    
+    #sidebar {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      bottom: 12px;
+      width: 140px;
+      background: rgba(17, 20, 24, 0.85);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      padding: 36px 8px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 900;
+      overflow-y: auto;
+    }
+    #thumb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .thumb-item {
+      position: relative;
+      width: 100%;
+      height: 84px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      pointer-events: none;
+      user-select: none;
+    }
+    .thumb-item.selected {
+      border-color: #22d3ee;
+      box-shadow: inset 0 0 0 1px rgba(34,211,238,0.35);
+    }
+    .thumb-item.selected::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #22d3ee;
+    }
+    .thumb-item.locked {
+      opacity: 0.95;
+    }
+    .thumb-actions {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 4px;
+      z-index: 2;
+    }
+    .thumb-action {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.5);
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+    .thumb-action:hover { background: rgba(0,0,0,0.65); }
+    
+    #sidebar .thumb-actions { display: none; }
+    .counter {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 1;
+      background: rgba(0,0,0,0.45);
+      color: #e5e7eb;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    #pixel-power {
+      position: static;
+      display: inline-block;
+      background: rgba(0,0,0,0.45);
+      color: #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+    /* Sound control floating (independent left of the panel) */
+    #sound-control { position: fixed; top: 16px; left: 16px; display: inline-flex; align-items: center; z-index: 1003; }
+    #sound-toggle { background-color: rgba(0,0,0,0.75); padding: 6px 10px; }
+    #sound-toggle.muted { opacity: 0.6; }
+    #sound-control .sound-slider { display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: rgba(17, 20, 24, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; gap: 8px; align-items: center; flex-direction: column; z-index: 1003; min-width: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+    #sound-control:hover .sound-slider, #sound-control.open .sound-slider, #sound-control.hover .sound-slider { display: flex; }
+    #sound-volume { position: relative; width: 12px; height: 170px; user-select: none; touch-action: none; cursor: pointer; }
+    #sound-volume .slider-track { position: absolute; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: rgba(255,255,255,0.18); border-radius: 9999px; }
+    #sound-volume .slider-fill { position: absolute; left: 50%; transform: translateX(-50%); width: 4px; bottom: 0; height: 0%; background: rgba(255,255,255,0.8); border-radius: 9999px; }
+    #sound-volume .slider-thumb { position: absolute; left: 50%; transform: translate(-50%, 50%); width: 12px; height: 12px; border-radius: 9999px; background: #e5e7eb; border: 1px solid rgba(255,255,255,0.5); bottom: 0%; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+    /* Movement control floating (bottom-right) */
+    #move-control { position: fixed; right: 16px; bottom: 16px; display: inline-flex; align-items: center; z-index: 1003; }
+    #btn-movement { background-color: rgba(0,0,0,0.75); }
+    #btn-movement:hover { background-color: rgba(0,0,0,0.60); }
+    #movement-popup { position: absolute; bottom: calc(100% + 8px); right: 0; background: rgba(17, 20, 24, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; gap: 8px; align-items: center; flex-direction: column; z-index: 1003; min-width: 120px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); display: flex; }
+    #movement-popup[hidden] { display: none; }
+    .movement-grid { display: grid; grid-template-columns: repeat(3, 34px); grid-auto-rows: 34px; gap: 8px; justify-content: center; align-items: center; }
+    .movement-grid .dir-btn { width: 34px; height: 34px; padding: 0; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+    .movement-grid .dir-btn.kbd-press,
+    .movement-grid .dir-btn:active,
+    .movement-grid .dir-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(34,211,238,0.35); box-shadow: inset 0 0 0 1px rgba(34,211,238,0.25); }
+    
+    #btn-accounts {
+      background-color: rgba(0,0,0,0.75);
+      position: static;
+    }
+    #btn-accounts:hover {
+      background-color: rgba(0,0,0,0.60);
+    }
+    #accounts-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.45);
+      z-index: 1100;
+    }
+    #accounts-modal[hidden] { display: none; }
+    #img-preview-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.45);
+      z-index: 1100;
+    }
+    #img-preview-modal[hidden] { display: none; }
+    body.no-scroll { overflow: hidden; }
+    #img-preview-canvas {
+      width: min(540px, 85vw);
+      height: min(360px, 48vh);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      image-rendering: pixelated;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    #img-preview-modal .modal-card { max-height: 90vh; }
+    #img-preview-modal .modal-body { max-height: none; overflow: visible; }
+    .img-preview-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 12px;
+      align-items: center;
+      pointer-events: auto;
+    }
+    .img-preview-flex { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 720px){ .img-preview-flex { grid-template-columns: 1fr; } }
+    #img-fill-side { pointer-events: auto; }
+    #img-fill-side .row { display: grid; grid-template-columns: 140px 1fr; gap: 10px 12px; align-items: center; }
+    #img-fill-side .row + .row { margin-top: 8px; }
+    #img-fill-side .color-row { align-items: start; }
+    #img-fill-color { display: grid; grid-template-columns: repeat(auto-fill, minmax(22px, 1fr)); gap: 6px; align-items: start; width: 100%; }
+    #img-fill-color .palette-swatch { cursor: pointer; width: 100%; aspect-ratio: 1 / 1; height: auto; min-width: 18px; }
+    #img-fill-color[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+    .modal-card {
+      background: rgba(17, 20, 24, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      width: min(800px, 95vw);
+      max-width: 95vw;
+      color: #e5e7eb;
+      padding: 16px 20px;
+      position: relative;
+    }
+    .modal-header {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+    }
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.5);
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.65); }
+    .modal-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 0 12px 0;
+    }
+    .tab-button.active {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(34,211,238,0.35);
+      box-shadow: inset 0 0 0 1px rgba(34,211,238,0.25);
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      position: absolute;
+      right: 20px;
+      bottom: 16px;
+      left: 20px;
+    }
+    .modal-body { padding-bottom: 56px; min-height: 300px; max-height: 400px; overflow-y: auto; }
+    .modal-footer.split { justify-content: space-between; }
+    .accounts-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; margin-right: 10px; }
+    #btn-check-all { margin-left: 8px; }
+    .app-btn .spin-indicator { display: none; margin-left: 6px; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .app-btn.spinning .spin-indicator { display: inline-block; animation: spin 1s linear infinite; }
+    .modal-card .form-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 12px;
+    }
+    .modal-card .form-grid label { font-size: 14px; align-self: center; }
+    .modal-card .form-grid input { width: 100%; }
+    .table-actions { display: flex; flex-direction: column; gap: 6px; }
+    .table-actions-row { display: flex; gap: 6px; }
+    
+    #app-toast-container { position: fixed; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; pointer-events: none; }
+    .app-toast { pointer-events: auto; min-width: 260px; max-width: 380px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.35); backdrop-filter: blur(6px); color: #fff; display: flex; align-items: center; gap: 10px; animation: toast-in 200ms ease-out; }
+    .app-toast.error { background: rgba(190, 24, 24, 0.9); }
+    .app-toast.success { background: rgba(22, 163, 74, 0.9); }
+    .app-toast .app-toast-message { flex: 1 1 auto; font-size: 14px; line-height: 1.35; }
+    .app-toast .app-toast-close { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.35); color: #e5e7eb; cursor: pointer; }
+    .app-toast.hide { animation: toast-out 250ms ease-in forwards; }
+    @keyframes toast-in { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes toast-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-8px); opacity: 0; } }
+    
+    #control-panel {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: rgba(17, 20, 24, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      padding: 10px 12px;
+      width: 280px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      z-index: 1001;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    }
+    #control-panel .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #ready-popup {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: rgba(17, 20, 24, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+      padding: 10px;
+      z-index: 1002;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 280px;
+    }
+      #ready-popup .ready-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+    #ready-account-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.35);
+    }
+    #ready-pixel {
+      display: inline-block;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    #ready-popup .controls-row { justify-content: center; gap: 10px; }
+    #ready-token-input { width: 320px; }
+    #select-mode-controls { justify-content: center; }
+    .select-mode-wrap { display: inline-flex; align-items: center; gap: 8px; }
+    .select-mode-label { font-size: 12px; color: #e5e7eb; opacity: 0.8; cursor: pointer; user-select: none; }
+    .select-mode-label.active { color: #22d3ee; opacity: 1; }
+    .select-mode-track { position: relative; width: 44px; height: 24px; border-radius: 9999px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; padding: 0; }
+    .select-mode-knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; transition: transform 0.18s ease; }
+    .select-mode-track.on .select-mode-knob { transform: translateX(20px); }
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle .slider { position: absolute; inset: 0; border-radius: 9999px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease; }
+    .toggle .slider::before { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 9999px; background: #e5e7eb; transition: transform 0.18s ease; }
+    .toggle input:checked + .slider { background: rgba(34,211,238,0.35); border-color: rgba(34,211,238,0.45); }
+    .toggle input:checked + .slider::before { transform: translateX(20px); }
+    
+    #color-palette {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 20, 24, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+      max-width: min(95vw, 720px);
+    }
+    .palette-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+    }
+    .palette-swatch:hover { filter: brightness(1.1); }
+    .palette-swatch.selected {
+      outline: 2px solid #22d3ee;
+      outline-offset: 0;
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 2px rgba(34,211,238,0.25);
+    }
+    .palette-swatch.transparent {
+      background-color: #bbb;
+      background-image:
+        linear-gradient(45deg, #888 25%, transparent 25%),
+        linear-gradient(-45deg, #888 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #888 75%),
+        linear-gradient(-45deg, transparent 75%, #888 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+    }
+    .palette-swatch.block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      line-height: 1;
+      background: rgba(0,0,0,0.25);
+    }
+    
+    #lang-switch {
+      position: fixed;
+      top: 16px;
+      left: 180px; 
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(17, 20, 24, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      padding: 6px 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    }
+    #lang-select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.25);
+      color: #e5e7eb;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <img id="sign" alt="sign" draggable="false" hidden />
+  <img id="pixel-hover" class="pixel-marker" alt="hover" hidden />
+  <div id="pixel-selected-list" hidden></div>
+  <div id="sound-control">
+    <button id="sound-toggle" class="app-btn" type="button" title="" aria-label="">🔊</button>
+    <div class="sound-slider" role="group" aria-label="Ses ayarı">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#e5e7eb;opacity:0.9;font-size:12px">
+        <span data-i18n=""></span>
+        <div id="sound-volume" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="Volume">
+          <div class="slider-track"></div>
+          <div class="slider-fill"></div>
+          <div class="slider-thumb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div id="control-panel">
+      <div class="controls-row">
+        
+        <button id="btn-accounts" class="app-btn" type="button" data-i18n="nav.accounts">Hesaplar</button>
+        <div id="pixel-power" role="status" aria-live="polite" data-i18n-dynamic="pixel.powerLabel" data-count="0" data-max="0">Piksel gücü: 0 / 0</div>
+      </div>
+      <div>
+        <button id="btn-ready" class="app-btn" type="button" disabled data-i18n="ready.prepare">Hazırlan</button>
+        <div id="ready-popup" hidden>
+          <div class="ready-header">
+            <button id="btn-ready-account" class="app-btn" type="button" data-i18n="ready.selectAccount">Hesap seç</button>
+            <div id="ready-pixel" role="status" aria-live="polite" data-i18n-dynamic="pixel.powerLabel" data-count="0" data-max="0">Piksel gücü: 0 / 0</div>
+          </div>
+          <div id="ready-account-list" hidden></div>
+          <div class="controls-row">
+            <button id="btn-auto-select-accounts" class="app-btn" type="button" data-i18n="ready.autoSelectAccounts">Auto select account</button>
+          </div>
+          <div class="controls-row">
+            <input id="ready-token-input" type="text" placeholder="Token" data-i18n-placeholder="ready.tokenPlaceholder" />
+          </div>
+          <div class="controls-row">
+            <button id="btn-auto-select" class="app-btn" type="button" data-i18n="ready.autoSelect">Otomatik seç</button>
+            <button id="start" class="app-btn" type="button" data-i18n="ready.start">Başlat</button>
+          </div>
+          <div class="controls-row" id="select-mode-controls">
+            <div class="select-mode-wrap">
+              <span id="select-mode-label-left" class="select-mode-label active" data-i18n="ready.selectMode.multi">Önce çok yerden seç</span>
+              <button id="select-mode-toggle" class="select-mode-track" type="button" role="switch" aria-checked="false" aria-label="Select mode">
+                <span class="select-mode-knob"></span>
+              </button>
+              <span id="select-mode-label-right" class="select-mode-label" data-i18n="ready.selectMode.frame">Önce çerçeveyi seç</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div id="sign-layer" hidden>
+    <div id="sign-outline"></div>
+  </div>
+  <input id="sign-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden />
+  <aside id="sidebar"><div id="counter" class="counter"></div><div id="thumb-list"></div></aside>
+  <div id="accounts-modal" hidden>
+    <div class="modal-card">
+      <button id="accounts-close" class="modal-close app-btn" title="Kapat" type="button" data-i18n-title="modal.closeTitle">×</button>
+      <div class="modal-tabs">
+        <button id="tab-accounts" class="tab-button active" type="button" data-i18n="tabs.accounts">Hesaplar</button>
+        <button id="tab-settings" class="tab-button" type="button" data-i18n="tabs.settings">Ayarlar</button>
+      </div>
+      <div class="modal-body">
+        <div id="accounts-section">
+          <div class="accounts-actions">
+            <button id="btn-account-add" class="app-btn" type="button" data-i18n="accounts.add">Hesap ekle</button>
+            <button id="btn-check-all" class="app-btn" type="button" data-i18n-title="accounts.checkAllTitle"><span class="label" data-i18n="accounts.checkAll">Check All Accounts</span> <span class="spin-indicator">⟳</span></button>
+          </div>
+          <div class="table-responsive">
+            <table id="accounts-table" class="table table-dark table-striped table-hover table-sm align-middle mb-2">
+              <thead>
+                <tr>
+                  <th data-i18n="table.accountName">Hesap ismi</th>
+                  <th data-i18n="table.accountToken">Hesap Tokeni</th>
+                  <th data-i18n="table.pixelRight">Piksel Hakkı</th>
+                  <th data-i18n="table.status">Durum</th>
+                  <th data-i18n="table.actions">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="accounts-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="account-form-section" hidden>
+          <div class="form-grid">
+            <label for="account-name-input" data-i18n="form.accountNameLabel">Hesap adı</label>
+            <input id="account-name-input" type="text" placeholder="Örn: Ana hesap" data-i18n-placeholder="form.accountNamePlaceholder" />
+            <label for="account-token-input" data-i18n="form.accountTokenLabel">Hesap tokeni</label>
+            <input id="account-token-input" type="text" placeholder="Örn: eyJhbGciOi..." data-i18n-placeholder="form.accountTokenPlaceholder" />
+            <input id="account-id-input" type="hidden" />
+          </div>
+          <div class="modal-footer split">
+            <button id="btn-account-cancel" class="app-btn" type="button" data-i18n="buttons.back">Geri</button>
+            <button id="btn-account-save" class="app-btn" type="button" data-i18n="buttons.add">Ekle</button>
+          </div>
+        </div>
+        <div id="settings-section" hidden>
+          <div class="form-grid">
+            <label for="settings-cf-clearance-input" data-i18n="settings.cf_clearance">cf_clearance</label>
+            <input id="settings-cf-clearance-input" type="text" placeholder="cf_clearance" />
+          </div>
+          <div class="modal-footer">
+            <button id="btn-settings-save" class="app-btn" type="button" data-i18n="buttons.saveSettings">Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="img-preview-modal" hidden>
+    <div class="modal-card" style="width:min(720px,95vw);max-width:95vw;">
+      <button id="img-preview-close" class="modal-close app-btn" title="Kapat" type="button" data-i18n-title="modal.closeTitle">×</button>
+      <div class="modal-header" data-i18n="form.uploadImage">Resim yükle</div>
+      <div class="modal-body">
+        <canvas id="img-preview-canvas" width="540" height="300" aria-label="Image preview"></canvas>
+        <div class="img-preview-flex">
+          <div>
+            <div class="img-preview-grid">
+              <label for="img-scale" data-i18n="preview.scale">Ölçek (%)</label>
+              <input id="img-scale" type="number" min="1" max="800" step="1" value="100" />
+              <label for="img-keep-ratio" data-i18n="preview.keepRatio">Oranı koru</label>
+              <label class="toggle" aria-label="Keep ratio">
+                <input id="img-keep-ratio" type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+              <label for="img-width" data-i18n="preview.width">Genişlik</label>
+              <input id="img-width" type="number" min="1" max="1000" step="1" />
+              <label for="img-height" data-i18n="preview.height">Yükseklik</label>
+              <input id="img-height" type="number" min="1" max="1000" step="1" />
+            </div>
+          </div>
+          <div id="img-fill-side">
+            <div class="row">
+              <label for="img-fill-toggle" data-i18n="preview.fillBackground" style="margin-right:8px;">Arka planı doldur</label>
+              <label class="toggle" aria-label="Fill background" style="justify-self:start;">
+                <input id="img-fill-toggle" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="row color-row">
+              <label for="img-fill-color" data-i18n="preview.color">Renk</label>
+              <div id="img-fill-color" aria-disabled="true"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="img-preview-cancel" class="app-btn" type="button" data-i18n="buttons.back">Geri</button>
+        <button id="img-preview-apply" class="app-btn" type="button" data-i18n="preview.addToMap">Haritaya ekle</button>
+      </div>
+    </div>
+  </div>
+
+  <form class="panel" id="form">
+    <label for="area-code" data-i18n="form.worldXLabel">World X</label>
+    <input id="area-code" name="area code" type="number" min="0" step="1" inputmode="numeric" />
+
+    <label for="no" data-i18n="form.worldYLabel">World Y</label>
+    <input id="no" name="no" type="number" min="0" step="1" inputmode="numeric" />
+
+    <button class="app-btn" type="submit" data-i18n="form.fetchButton">Getir</button>
+    <button class="app-btn" type="button" id="btn-upload-sign" data-i18n="form.uploadImage">Resim yükle</button>
+  </form>
+ 
+  <div id="app-toast-container" aria-live="polite" aria-atomic="true"></div>
+  <div id="color-palette" aria-label="Renk paleti" role="group" data-i18n-aria-label="labels.colorPalette"></div>
+
+  <div id="move-control">
+    <button id="btn-movement" class="app-btn" type="button" data-i18n="controls.movement">Hareket</button>
+    <div id="movement-popup" hidden>
+      <div class="movement-grid">
+        <span></span>
+        <button id="move-up" class="app-btn dir-btn" type="button" title="Yukarı" aria-label="Yukarı" data-i18n-title="movement.up" data-i18n-aria-label="movement.up">▲</button>
+        <span></span>
+        <button id="move-left" class="app-btn dir-btn" type="button" title="Sola" aria-label="Sola" data-i18n-title="movement.left" data-i18n-aria-label="movement.left">◄</button>
+        <span></span>
+        <button id="move-right" class="app-btn dir-btn" type="button" title="Sağa" aria-label="Sağa" data-i18n-title="movement.right" data-i18n-aria-label="movement.right">►</button>
+        <span></span>
+        <button id="move-down" class="app-btn dir-btn" type="button" title="Aşağı" aria-label="Aşağı" data-i18n-title="movement.down" data-i18n-aria-label="movement.down">▼</button>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    
+    const I18N_DEFAULT_LANG = 'en';
+    let I18N_LANG = I18N_DEFAULT_LANG;
+    let I18N_STRINGS = {};
+    function getSavedLang(){ try { return localStorage.getItem('lang') || I18N_DEFAULT_LANG; } catch { return I18N_DEFAULT_LANG; } }
+    function saveLang(lang){ try { localStorage.setItem('lang', lang); } catch {} }
+    async function loadI18n(lang){
+      try {
+        const res = await fetch('/i18n/' + encodeURIComponent(lang) + '.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('i18n load failed');
+        I18N_STRINGS = await res.json();
+      } catch {
+        I18N_STRINGS = {};
+      }
+    }
+    function t(key, vars){
+      const parts = String(key || '').split('.');
+      let cur = I18N_STRINGS;
+      for (let i = 0; i < parts.length; i++) {
+        const k = parts[i];
+        if (cur && Object.prototype.hasOwnProperty.call(cur, k)) cur = cur[k]; else { cur = null; break; }
+      }
+      let s = (typeof cur === 'string') ? cur : String(key || '');
+      if (vars && typeof s === 'string') {
+        s = s.replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? String(vars[k]) : ''));
+      }
+      return s;
+    }
+    function applyTranslations(){
+      try { document.documentElement.lang = I18N_LANG; } catch {}
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        try { el.textContent = t(el.getAttribute('data-i18n')); } catch {}
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        try { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder'))); } catch {}
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        try { el.setAttribute('title', t(el.getAttribute('data-i18n-title'))); } catch {}
+      });
+      document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        try { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria-label'))); } catch {}
+      });
+      
+      try {
+        const p = document.getElementById('pixel-power');
+        if (p) {
+          const count = Number(p.getAttribute('data-count') || '0');
+          const max = Number(p.getAttribute('data-max') || '0');
+          p.textContent = t('pixel.powerLabel', { count, max });
+        }
+      } catch {}
+      try {
+        const rp = document.getElementById('ready-pixel');
+        if (rp) {
+          const count = Number(rp.getAttribute('data-count') || '0');
+          const max = Number(rp.getAttribute('data-max') || '0');
+          rp.textContent = t('pixel.powerLabel', { count, max });
+        }
+      } catch {}
+    }
+    async function setLanguage(lang){
+      I18N_LANG = lang || I18N_DEFAULT_LANG;
+      saveLang(I18N_LANG);
+      await loadI18n(I18N_LANG);
+      applyTranslations();
+      try { if (typeof loadAccounts === 'function') { await loadAccounts(); } } catch {}
+    }
+    async function initI18n(){
+      const initial = getSavedLang();
+      await setLanguage(initial);
+      const sel = document.getElementById('lang-select');
+      if (sel) {
+        try { sel.value = I18N_LANG; } catch {}
+        sel.addEventListener('change', async () => { await setLanguage(sel.value); });
+      }
+    }
+
+    
+    function ensureToastContainer() {
+      let el = document.getElementById('app-toast-container');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'app-toast-container';
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+    function showToast(message, variant = 'error', durationMs = 3000) {
+      const container = ensureToastContainer();
+      const toast = document.createElement('div');
+      toast.className = 'app-toast ' + variant;
+      const msg = document.createElement('div');
+      msg.className = 'app-toast-message';
+      msg.textContent = message;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'app-toast-close';
+      btn.textContent = '×';
+      btn.addEventListener('click', () => hideToast(toast));
+      toast.appendChild(msg);
+      toast.appendChild(btn);
+      container.appendChild(toast);
+      const t = setTimeout(() => hideToast(toast), durationMs);
+      toast._timer = t;
+    }
+    function hideToast(toast) {
+      if (!toast || toast.classList.contains('hide')) return;
+      try { clearTimeout(toast._timer); } catch {}
+      toast.classList.add('hide');
+      toast.addEventListener('animationend', () => {
+        try { toast.parentNode && toast.parentNode.removeChild(toast); } catch {}
+      }, { once: true });
+    }
+    
+    function ensureLangSwitch(){
+      let el = document.getElementById('lang-switch');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'lang-switch';
+        el.innerHTML = '<select id="lang-select"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="es">Español</option><option value="fr">Français</option><option value="ru">Русский</option><option value="ja">日本語</option></select>';
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+    function layoutLangSwitch(){
+      const ls = document.getElementById('lang-switch');
+      const sidebarEl = document.getElementById('sidebar');
+      const formEl = document.getElementById('form');
+      if (!ls || !sidebarEl || !formEl) return;
+      const sb = sidebarEl.getBoundingClientRect();
+      const fm = formEl.getBoundingClientRect();
+      const y = Math.min(sb.top, fm.top) + 4; 
+      const xLeft = sb.right + 12;
+      const xRight = fm.left - 12;
+      const center = (xLeft + xRight) / 2;
+      const width = Math.min(220, Math.max(140, xRight - xLeft));
+      try { ls.style.width = String(width) + 'px'; } catch {}
+      try { ls.style.top = String(y) + 'px'; } catch {}
+      try { ls.style.left = String(center - (width/2)) + 'px'; } catch {}
+    }
+    window.addEventListener('resize', layoutLangSwitch);
+    window.addEventListener('scroll', layoutLangSwitch, { passive: true });
+
+    function layoutSoundControl(){
+      const el = document.getElementById('sound-control');
+      const accountsBtnLocal = document.getElementById('btn-accounts');
+      const controlPanel = document.getElementById('control-panel');
+      if (!el || !accountsBtnLocal || !controlPanel) return;
+      const ac = accountsBtnLocal.getBoundingClientRect();
+      const cp = controlPanel.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const elWidth = elRect.width || el.offsetWidth || 40;
+      const elHeight = elRect.height || el.offsetHeight || 28;
+      const topPx = Math.round(ac.top + (ac.height - elHeight) / 2);
+      const leftPx = Math.round(cp.left - 12 - elWidth);
+      try { el.style.top = String(topPx) + 'px'; } catch {}
+      try { el.style.left = String(Math.max(8, leftPx)) + 'px'; } catch {}
+    }
+    window.addEventListener('resize', layoutSoundControl);
+    window.addEventListener('scroll', layoutSoundControl, { passive: true });
+
+    
+    try { ensureLangSwitch(); initI18n(); layoutLangSwitch(); } catch {}
+    try { layoutSoundControl(); } catch {}
+
+    const areaInput = document.getElementById('area-code');
+    const noInput = document.getElementById('no');
+
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    const sign = document.getElementById('sign');
+    const pixelHoverEl = document.getElementById('pixel-hover');
+    const colorPaletteEl = document.getElementById('color-palette');
+    const pixelSelectedList = document.getElementById('pixel-selected-list');
+    const signLayer = document.getElementById('sign-layer');
+    const signOutline = document.getElementById('sign-outline');
+    const signFileInput = document.getElementById('sign-file');
+    const uploadBtn = document.getElementById('btn-upload-sign');
+    const sidebar = document.getElementById('sidebar');
+    const thumbList = document.getElementById('thumb-list');
+    const counter = document.getElementById('counter');
+    const accountsBtn = document.getElementById('btn-accounts');
+      const pixelPowerEl = document.getElementById('pixel-power');
+    const soundToggleBtn = document.getElementById('sound-toggle');
+    const soundVolumeEl = document.getElementById('sound-volume');
+    const soundVolumeValue = document.getElementById('sound-volume-value');
+
+    let soundEnabled = true;
+    let soundVolume = 1.0;
+    try {
+      const se = localStorage.getItem('sound.enabled');
+      const sv = localStorage.getItem('sound.volume');
+      if (se != null) soundEnabled = (se === 'true');
+      if (sv != null && !isNaN(Number(sv))) soundVolume = Math.min(1, Math.max(0, Number(sv)));
+    } catch {}
+
+    let audioCtx = null;
+    function ensureAudioCtx(){
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx && audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch {} }
+      } catch {}
+      return audioCtx;
+    }
+    function playNotifySound(){
+      if (!soundEnabled) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      try { ctx.resume(); } catch {}
+      const now = ctx.currentTime;
+
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.0001, now);
+      const targetVol = Math.max(0.0001, soundVolume * 0.8);
+      masterGain.gain.exponentialRampToValueAtTime(targetVol, now + 0.02);
+      masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      masterGain.connect(ctx.destination);
+
+      const delay = ctx.createDelay(0.5);
+      delay.delayTime.value = 0.14;
+      const feedback = ctx.createGain(); feedback.gain.value = 0.25;
+      const delayMix = ctx.createGain(); delayMix.gain.value = 0.35;
+      delay.connect(feedback); feedback.connect(delay);
+      delay.connect(delayMix); delayMix.connect(masterGain);
+
+      function makeVoice(frequencyHz, startOffsetSec, durationSec){
+        const startAt = now + startOffsetSec;
+        const stopAt = startAt + durationSec;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frequencyHz * 0.995, startAt);
+        osc.frequency.linearRampToValueAtTime(frequencyHz, startAt + 0.08);
+
+        const overtone = ctx.createOscillator();
+        overtone.type = 'triangle';
+        overtone.frequency.value = frequencyHz * 2;
+        overtone.detune.value = 3;
+
+        const vibrato = ctx.createOscillator();
+        vibrato.type = 'sine';
+        vibrato.frequency.value = 6;
+        const vibratoGain = ctx.createGain();
+        vibratoGain.gain.value = frequencyHz * 0.015;
+        vibrato.connect(vibratoGain);
+        vibratoGain.connect(osc.frequency);
+
+        const voiceGain = ctx.createGain();
+        voiceGain.gain.setValueAtTime(0.0001, startAt);
+        voiceGain.gain.exponentialRampToValueAtTime(targetVol, startAt + 0.03);
+        voiceGain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+
+        osc.connect(voiceGain);
+        const overtoneGain = ctx.createGain(); overtoneGain.gain.value = 0.22;
+        overtone.connect(overtoneGain); overtoneGain.connect(voiceGain);
+
+        const dry = ctx.createGain(); dry.gain.value = 1.0;
+        voiceGain.connect(dry); dry.connect(masterGain);
+        const wetSend = ctx.createGain(); wetSend.gain.value = 0.55;
+        voiceGain.connect(wetSend); wetSend.connect(delay);
+
+        osc.start(startAt);
+        overtone.start(startAt);
+        vibrato.start(startAt);
+        vibrato.stop(stopAt);
+        overtone.stop(stopAt);
+        osc.stop(stopAt + 0.01);
+      }
+
+      makeVoice(659.25, 0.00, 0.50);
+      makeVoice(987.77, 0.09, 0.50);
+      makeVoice(1318.51, 0.18, 0.65);
+
+      try {
+        const noiseDur = 0.18;
+        const noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * noiseDur), ctx.sampleRate);
+        const ch = noiseBuf.getChannelData(0);
+        for (let i = 0; i < ch.length; i++) {
+          const t = i / ch.length;
+          ch[i] = (Math.random() * 2 - 1) * (1 - t) * (1 - t) * 0.5;
+        }
+        const noise = ctx.createBufferSource(); noise.buffer = noiseBuf;
+        const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 4200; bp.Q.value = 1.1;
+        const ng = ctx.createGain(); ng.gain.value = targetVol * 0.18;
+        noise.connect(bp); bp.connect(ng); ng.connect(masterGain);
+        noise.start(now);
+        noise.stop(now + noiseDur);
+      } catch {}
+    }
+    function updateSoundUi(){
+      try {
+        if (soundVolumeEl) {
+          const percent = Math.round(soundVolume * 100);
+          try { soundVolumeEl.setAttribute('aria-valuenow', String(percent)); } catch {}
+          try {
+            const fill = soundVolumeEl.querySelector('.slider-fill');
+            const thumb = soundVolumeEl.querySelector('.slider-thumb');
+            if (fill) fill.style.height = percent + '%';
+            if (thumb) thumb.style.bottom = percent + '%';
+          } catch {}
+        }
+        if (soundVolumeValue) soundVolumeValue.textContent = Math.round(soundVolume * 100) + '%';
+        if (soundToggleBtn) {
+          soundToggleBtn.classList.toggle('muted', !soundEnabled || soundVolume === 0);
+          soundToggleBtn.textContent = (!soundEnabled || soundVolume === 0) ? '🔇' : (soundVolume < 0.5 ? '🔈' : '🔊');
+          soundToggleBtn.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        }
+      } catch {}
+    }
+    function setSoundEnabled(v){
+      soundEnabled = !!v;
+      try { localStorage.setItem('sound.enabled', soundEnabled ? 'true' : 'false'); } catch {}
+      updateSoundUi();
+    }
+    function setSoundVolume(v){
+      const n = Number(v);
+      if (!isNaN(n)) {
+        const normalized = n > 1 ? (n / 100) : n;
+        soundVolume = Math.min(1, Math.max(0, normalized));
+        try { localStorage.setItem('sound.volume', String(soundVolume)); } catch {}
+        updateSoundUi();
+      }
+    }
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isZero = soundVolume === 0;
+        if (isZero) {
+          setSoundEnabled(true);
+          setSoundVolume(1);
+          try { ensureAudioCtx(); } catch {}
+        } else {
+          setSoundVolume(0);
+        }
+      });
+      soundToggleBtn.addEventListener('mouseenter', () => {
+        const sc = document.getElementById('sound-control');
+        if (sc) sc.classList.add('open');
+      });
+      soundToggleBtn.addEventListener('mouseleave', (e) => {
+        const sc = document.getElementById('sound-control');
+        if (!sc) return;
+        const to = e && e.relatedTarget ? e.relatedTarget : null;
+        if (to && sc.contains(to)) return; 
+        setTimeout(() => { if (!sc.matches(':hover')) sc.classList.remove('open'); }, 120);
+      });
+      // Toggle mute with middle-click
+      soundToggleBtn.addEventListener('auxclick', (e) => {
+        if (e && e.button === 1) { e.preventDefault(); setSoundEnabled(!soundEnabled); updateSoundUi(); }
+      });
+    }
+    if (soundVolumeEl) {
+      let isDraggingVol = false;
+      const onMove = (clientY) => {
+        const rect = soundVolumeEl.getBoundingClientRect();
+        const y = Math.min(Math.max(clientY - rect.top, 0), rect.height);
+        const ratio = 1 - (y / rect.height);
+        setSoundVolume(ratio);
+        if (soundEnabled) { try { ensureAudioCtx(); } catch {} }
+      };
+      soundVolumeEl.addEventListener('pointerdown', (e) => {
+        isDraggingVol = true;
+        try { soundVolumeEl.setPointerCapture(e.pointerId); } catch {}
+        onMove(e.clientY);
+        const sc = document.getElementById('sound-control');
+        if (sc) sc.classList.add('open');
+      });
+      soundVolumeEl.addEventListener('pointermove', (e) => {
+        if (!isDraggingVol) return;
+        onMove(e.clientY);
+      });
+      const endDrag = () => {
+        if (!isDraggingVol) return;
+        isDraggingVol = false;
+        const sc = document.getElementById('sound-control');
+        setTimeout(() => { if (sc && !sc.matches(':hover')) sc.classList.remove('open'); }, 200);
+      };
+      soundVolumeEl.addEventListener('pointerup', endDrag);
+      soundVolumeEl.addEventListener('pointercancel', endDrag);
+      soundVolumeEl.addEventListener('mouseleave', () => {
+        const sc = document.getElementById('sound-control');
+        setTimeout(() => { if (sc && !sc.matches(':hover')) sc.classList.remove('open'); }, 200);
+      });
+    }
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      const sc = document.getElementById('sound-control');
+      if (!sc) return;
+      if (sc.contains(e.target)) return;
+      sc.classList.remove('open');
+    });
+    updateSoundUi();
+
+    // Movement controls (pixel-by-pixel image movement)
+    const movementBtn = document.getElementById('btn-movement');
+    const movementPopup = document.getElementById('movement-popup');
+    const moveUpBtn = document.getElementById('move-up');
+    const moveDownBtn = document.getElementById('move-down');
+    const moveLeftBtn = document.getElementById('move-left');
+    const moveRightBtn = document.getElementById('move-right');
+
+    function isMovementOpen(){
+      try { return !!(movementPopup && !movementPopup.hidden); } catch { return false; }
+    }
+    function getSelectedItem(){
+      try {
+        return (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+      } catch { return null; }
+    }
+    function updateMovementButtonEnabled(){
+      if (!movementBtn) return;
+      const it = getSelectedItem();
+      let enable = false;
+      try { enable = !!(it && it.image && it.image.complete && !(it.locked || it.lockedByReady)); } catch { enable = false; }
+      try { movementBtn.disabled = !enable; } catch {}
+      // Do not auto-close when disabled due to transient selection changes; keep user's choice.
+    }
+    function clampPositionForItem(item, x, y){
+      let nx = Math.round(x|0), ny = Math.round(y|0);
+      try {
+        if (img && item && item.image && item.image.naturalWidth && item.image.naturalHeight) {
+          const maxX = Math.max(0, img.width - item.image.naturalWidth);
+          const maxY = Math.max(0, img.height - item.image.naturalHeight);
+          nx = Math.min(Math.max(0, nx), maxX);
+          ny = Math.min(Math.max(0, ny), maxY);
+        }
+      } catch {}
+      return { x: nx, y: ny };
+    }
+    function moveSelectedBy(dx, dy, step){
+      const it = getSelectedItem();
+      if (!it || !it.image || !it.image.complete) { try { showToast(t('messages.noSelectedImage'), 'error', 1800); } catch {} return; }
+      if (it.locked || it.lockedByReady) { return; }
+      const mult = Number.isFinite(step) ? Math.max(1, step|0) : 1;
+      const targetX = (it.worldX || 0) + dx * mult;
+      const targetY = (it.worldY || 0) + dy * mult;
+      const clamped = clampPositionForItem(it, targetX, targetY);
+      if (clamped.x === (it.worldX||0) && clamped.y === (it.worldY||0)) return;
+      it.worldX = clamped.x;
+      it.worldY = clamped.y;
+      try { it._placedCountCache = null; } catch {}
+      render();
+      try { updatePixelMarkers(); } catch {}
+      if (isReadyOpen()) { try { updateReadySelectionLabel(); } catch {} }
+    }
+    function setupMoveHold(btn, dx, dy){
+      if (!btn) return;
+      const stop = () => {
+        try { if (btn._mvInt) { clearInterval(btn._mvInt); btn._mvInt = null; } } catch {}
+        try { if (btn._mvTmo) { clearTimeout(btn._mvTmo); btn._mvTmo = null; } } catch {}
+      };
+      btn.addEventListener('click', (e) => { e.preventDefault(); moveSelectedBy(dx, dy, e && e.shiftKey ? 5 : 1); });
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const step = e && e.shiftKey ? 5 : 1;
+        moveSelectedBy(dx, dy, step);
+        try { btn.setPointerCapture(e.pointerId); } catch {}
+        btn._mvTmo = setTimeout(() => {
+          btn._mvInt = setInterval(() => moveSelectedBy(dx, dy, step), 50);
+        }, 250);
+      });
+      const end = () => { stop(); };
+      btn.addEventListener('pointerup', end);
+      btn.addEventListener('pointercancel', end);
+      btn.addEventListener('pointerleave', end);
+    }
+    if (movementBtn && movementPopup) {
+      function clearKbdPressVisuals(){
+        setKbdVisual('up', false);
+        setKbdVisual('down', false);
+        setKbdVisual('left', false);
+        setKbdVisual('right', false);
+      }
+      movementBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (movementBtn.disabled) return;
+        movementPopup.hidden = !movementPopup.hidden;
+        if (movementPopup.hidden) clearKbdPressVisuals();
+      });
+      // Removed auto-close on outside click to prevent flicker when focusing an image.
+      function setKbdVisual(dir, on){
+        try {
+          const map = { up: moveUpBtn, down: moveDownBtn, left: moveLeftBtn, right: moveRightBtn };
+          const el = map[dir]; if (!el) return;
+          if (on) el.classList.add('kbd-press'); else el.classList.remove('kbd-press');
+        } catch {}
+      }
+      window.addEventListener('keydown', (e) => {
+        if (!isMovementOpen()) return;
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable)) return;
+        let handled = false;
+        const step = e.shiftKey ? 5 : 1;
+        if (e.key === 'ArrowUp') { moveSelectedBy(0, -1, step); setKbdVisual('up', true); handled = true; }
+        else if (e.key === 'ArrowDown') { moveSelectedBy(0, 1, step); setKbdVisual('down', true); handled = true; }
+        else if (e.key === 'ArrowLeft') { moveSelectedBy(-1, 0, step); setKbdVisual('left', true); handled = true; }
+        else if (e.key === 'ArrowRight') { moveSelectedBy(1, 0, step); setKbdVisual('right', true); handled = true; }
+        else if (e.key === 'Escape') { movementPopup.hidden = true; handled = true; }
+        if (handled) { try { e.preventDefault(); e.stopPropagation(); } catch {} }
+      });
+      window.addEventListener('keyup', (e) => {
+        if (!isMovementOpen()) return;
+        if (e.key === 'ArrowUp') setKbdVisual('up', false);
+        else if (e.key === 'ArrowDown') setKbdVisual('down', false);
+        else if (e.key === 'ArrowLeft') setKbdVisual('left', false);
+        else if (e.key === 'ArrowRight') setKbdVisual('right', false);
+      });
+    }
+    setupMoveHold(moveUpBtn, 0, -1);
+    setupMoveHold(moveDownBtn, 0, 1);
+    setupMoveHold(moveLeftBtn, -1, 0);
+    setupMoveHold(moveRightBtn, 1, 0);
+    updateMovementButtonEnabled();
+
+    // Pixel fullness notifier
+    const FULLNESS_NOTIFY_PERIOD_MS = 30 * 1000;
+    let lastFullnessNotifyAt = 0;
+    function maybeNotifyFullnessNow(){
+      const now = Date.now();
+      if (now - lastFullnessNotifyAt >= FULLNESS_NOTIFY_PERIOD_MS - 50) {
+        lastFullnessNotifyAt = now;
+        playNotifySound();
+      }
+    }
+    function checkFullnessNotify(){
+      try {
+        const c = Number(pixelPowerEl && pixelPowerEl.getAttribute('data-count') || '0');
+        const m = Number(pixelPowerEl && pixelPowerEl.getAttribute('data-max') || '0');
+        const ratio = m > 0 ? (c / m) : 0;
+        if (ratio >= 0.90) maybeNotifyFullnessNow();
+      } catch {}
+    }
+    try { setInterval(() => { checkFullnessNotify(); }, FULLNESS_NOTIFY_PERIOD_MS); } catch {}
+    const accountsModal = document.getElementById('accounts-modal');
+    const accountsClose = document.getElementById('accounts-close');
+    const accountsBody = document.querySelector('#accounts-modal .modal-body');
+    const tabAccounts = document.getElementById('tab-accounts');
+    const tabSettings = document.getElementById('tab-settings');
+    const accountsSection = document.getElementById('accounts-section');
+    const accountFormSection = document.getElementById('account-form-section');
+    const settingsSection = document.getElementById('settings-section');
+    const settingsCfInput = document.getElementById('settings-cf-clearance-input');
+    const accountsTbody = document.getElementById('accounts-tbody');
+    const addAccountBtn = document.getElementById('btn-account-add');
+    const checkAllBtn = document.getElementById('btn-check-all');
+    const accountNameInput = document.getElementById('account-name-input');
+    const accountTokenInput = document.getElementById('account-token-input');
+    const accountIdInput = document.getElementById('account-id-input');
+    const accountCancelBtn = document.getElementById('btn-account-cancel');
+    const accountSaveBtn = document.getElementById('btn-account-save');
+    const settingsSaveBtn = document.getElementById('btn-settings-save');
+    let signDragging = false;
+    let signWorldX = 0;
+    let signWorldY = 0;
+    let signWorldOffsetX = 0;
+    let signWorldOffsetY = 0;
+    let currentSignUrl = null;
+    let placingNewSign = false;
+    let signItems = [];
+    let selectedIndex = -1;
+    let pendingZoomToSelected = false;
+    let readyLockedItem = null;
+    let accountsData = [];
+    let readySelectedAccountIds = [];
+    const MAX_READY_ACCOUNTS = 12;
+    
+    let readyShouldReset = false;
+
+    
+    const HOVER_ICON_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAAAAACoWZBhAAAAAXNSR0IArs4c6QAAACpJREFUeNpj+AsEZ86ASIa/DAwMZ84ACRDzDBigMs/AARITq1oUwxBWAADaREUdDMswKwAAAABJRU5ErkJggg==';
+    const SELECTED_ICON_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAQAAAAnOwc2AAAAAXNSR0IArs4c6QAAACVJREFUeNpj+A8FDEAAZwMRBAIBmIYLIgHcgkQDIs3E6SRsjgcABYFLtfTgakEAAAAASUVORK5CYII=';
+    try { if (pixelHoverEl) pixelHoverEl.src = HOVER_ICON_SRC; } catch {}
+    
+    const pixelHoverFillEl = (() => {
+      const im = document.createElement('img');
+      im.className = 'pixel-marker';
+      im.alt = 'hover-fill';
+      im.hidden = true;
+      try { im.style.zIndex = '1299'; } catch {}
+      try { document.body.appendChild(im); } catch {}
+      return im;
+    })();
+
+    
+    let readyHoverPixel = { x: null, y: null };
+    
+    let selectedOverrideColorId = null;
+    
+    let readyGlobalMode = false;
+    const readyGlobalSelected = new Map(); 
+    let readyMouseDownPt = null; 
+    let readyMouseMoved = false;
+    let autoSelectDeleteMode = false;
+    const READY_CLICK_MOVE_TOLERANCE = 4;
+    function getPaletteRgbById(id){
+      for (let i = 0; i < PALETTE.length; i++) { if (PALETTE[i].id === id) return PALETTE[i].rgb; }
+      return [255,255,255];
+    }
+    const COLORED_MARKER_CACHE = new Map();
+    function getMarkerSrcForColorId(colorId){
+      if (colorId == null) return SELECTED_ICON_SRC;
+      const k = String(colorId);
+      if (COLORED_MARKER_CACHE.has(k)) return COLORED_MARKER_CACHE.get(k);
+      const rgb = getPaletteRgbById(colorId);
+      const off = document.createElement('canvas');
+      off.width = 8; off.height = 8;
+      const octx = off.getContext('2d');
+      octx.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+      octx.fillRect(0, 0, off.width, off.height);
+      const url = off.toDataURL('image/png');
+      COLORED_MARKER_CACHE.set(k, url);
+      return url;
+    }
+    
+    function getSelectedMap(item){
+      if (!item) return null;
+      if (!item._selectedPixels) item._selectedPixels = new Map();
+      return item._selectedPixels;
+    }
+    function keyFor(x,y){ return String(x) + ',' + String(y); }
+    function isPixelSelected(item, x, y){
+      const map = getSelectedMap(item); if (!map) return false; return map.has(keyFor(x,y));
+    }
+    function addPixelSelection(item, x, y, colorIdOverride = null){
+      const map = getSelectedMap(item); if (!map) return false;
+      const k = keyFor(x,y); if (map.has(k)) return false;
+      const el = document.createElement('img');
+      el.className = 'pixel-marker';
+      el.alt = 'selected';
+      el.src = SELECTED_ICON_SRC;
+      let fillEl = null;
+      if (colorIdOverride != null && colorIdOverride !== 0) {
+        fillEl = document.createElement('img');
+        fillEl.className = 'pixel-marker';
+        fillEl.alt = 'fill';
+        try { fillEl.style.zIndex = '1299'; } catch {}
+        fillEl.src = getMarkerSrcForColorId(colorIdOverride);
+      }
+      map.set(k, { x, y, el, fillEl, colorId: colorIdOverride });
+      try { item._lastManualSelected = { x, y }; } catch {}
+      if (pixelSelectedList) {
+        if (fillEl) pixelSelectedList.appendChild(fillEl);
+        pixelSelectedList.appendChild(el);
+      }
+      if (fillEl) positionPixelMarker(fillEl, item, x, y);
+      positionPixelMarker(el, item, x, y);
+      if (pixelSelectedList) pixelSelectedList.hidden = false;
+      return true;
+    }
+    function removePixelSelection(item, x, y){
+      const map = getSelectedMap(item); if (!map) return false;
+      const k = keyFor(x,y); const rec = map.get(k); if (!rec) return false;
+      try { if (rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); } catch {}
+      try { if (rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl); } catch {}
+      map.delete(k);
+      return true;
+    }
+    function clearSelectionsForItem(item){
+      const map = getSelectedMap(item);
+      if (!map) return;
+      try {
+        map.forEach(rec => {
+          if (rec && rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el);
+          if (rec && rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl);
+        });
+      } catch {}
+      map.clear();
+      try { item._lastManualSelected = null; } catch {}
+    }
+    function clearAllReadySelections(){
+      try { if (pixelHoverEl) pixelHoverEl.hidden = true; } catch {}
+      try { if (pixelSelectedList) pixelSelectedList.hidden = true; } catch {}
+      for (let i = 0; i < signItems.length; i++) {
+        const it = signItems[i];
+        if (it) clearSelectionsForItem(it);
+      }
+      
+      try {
+        if (readyGlobalSelected && readyGlobalSelected.size > 0) {
+          readyGlobalSelected.forEach(rec => {
+            try { if (rec && rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); } catch {}
+            try { if (rec && rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl); } catch {}
+          });
+          readyGlobalSelected.clear();
+        }
+      } catch {}
+      try {
+        if (pixelSelectedList) {
+          while (pixelSelectedList.firstChild) pixelSelectedList.removeChild(pixelSelectedList.firstChild);
+        }
+      } catch {}
+      updatePixelMarkers();
+      try { updateReadySelectionLabel(); } catch {}
+      try { updateStartEnabled(); } catch {}
+      try { updateAutoSelectButtonLabel(); } catch {}
+    }
+    function ensureRenderedSelectedForItem(item){
+      if (!pixelSelectedList || !item) return;
+      const current = pixelSelectedList._forItem || null;
+      if (current !== item) {
+        try { while (pixelSelectedList.firstChild) pixelSelectedList.removeChild(pixelSelectedList.firstChild); } catch {}
+        const map = getSelectedMap(item);
+        if (map) map.forEach(rec => {
+          if (rec && rec.fillEl) pixelSelectedList.appendChild(rec.fillEl);
+          if (rec && rec.el) pixelSelectedList.appendChild(rec.el);
+        });
+        pixelSelectedList._forItem = item;
+      }
+    }
+    function positionSelectedMarkersForItem(item){
+      const map = getSelectedMap(item); if (!map) return;
+      map.forEach(rec => {
+        if (rec && rec.fillEl) positionPixelMarker(rec.fillEl, item, rec.x, rec.y);
+        if (rec && rec.el) positionPixelMarker(rec.el, item, rec.x, rec.y);
+      });
+    }
+
+    function isReadyOpen() {
+      try {
+        const rp = document.getElementById('ready-popup');
+        return !!(rp && !rp.hidden);
+      } catch { return false; }
+    }
+
+    function ensureItemImageData(item){
+      if (!item || !item.image) return null;
+      if (item._imageData && item._imageData.width === item.image.naturalWidth && item._imageData.height === item.image.naturalHeight) return item._imageData;
+      try {
+        const off = document.createElement('canvas');
+        off.width = item.image.naturalWidth; off.height = item.image.naturalHeight;
+        const octx = off.getContext('2d', { willReadFrequently: true });
+        octx.drawImage(item.image, 0, 0);
+        item._imageData = octx.getImageData(0, 0, off.width, off.height);
+        return item._imageData;
+      } catch { return null; }
+    }
+
+    function isOpaquePixel(item, sx, sy){
+      const id = ensureItemImageData(item);
+      if (!id) return false;
+      if (sx < 0 || sy < 0 || sx >= id.width || sy >= id.height) return false;
+      const a = id.data[((id.width * sy + sx) << 2) + 3];
+      return a !== 0;
+    }
+
+    
+    function getItemPixelColor(item, sx, sy){
+      const id = ensureItemImageData(item);
+      if (!id) return null;
+      if (sx < 0 || sy < 0 || sx >= id.width || sy >= id.height) return null;
+      const i = ((id.width * sy + sx) << 2);
+      return { r: id.data[i], g: id.data[i+1], b: id.data[i+2], a: id.data[i+3] };
+    }
+    function getBasePixelColorAtWorld(wx, wy){
+      const baseId = ensureBaseImageData();
+      if (!baseId) return null;
+      const x = Math.round(wx);
+      const y = Math.round(wy);
+      if (x < 0 || y < 0 || x >= baseId.width || y >= baseId.height) return null;
+      const i = ((baseId.width * y + x) << 2);
+      return { r: baseId.data[i], g: baseId.data[i+1], b: baseId.data[i+2], a: baseId.data[i+3] };
+    }
+    function logSelectionDetails(item, sx, sy){  }
+
+    function worldToScreen(wx, wy){
+      const rect = canvas.getBoundingClientRect();
+      return { x: rect.left + state.translateX + wx * state.scale, y: rect.top + state.translateY + wy * state.scale };
+    }
+
+    function hitOverlayAt(worldX, worldY){
+      const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+      if (!sel || !sel._overlayRects) return null;
+      const r = sel._overlayRects;
+      if (r.lock && worldX >= r.lock.x && worldX <= r.lock.x + r.lock.w && worldY >= r.lock.y && worldY <= r.lock.y + r.lock.h) return 'lock';
+      if (r.del && worldX >= r.del.x && worldX <= r.del.x + r.del.w && worldY >= r.del.y && worldY <= r.del.y + r.del.h) return 'del';
+      return null;
+    }
+    function updateCanvasCursorAt(worldX, worldY){
+      try {
+        const hit = hitOverlayAt(worldX, worldY);
+        if (hit) canvas.style.cursor = 'pointer'; else canvas.style.cursor = '';
+      } catch {}
+    }
+
+    function positionPixelMarker(el, item, sx, sy){
+      if (!el || !item) return;
+      const wx = (item.worldX || 0) + sx;
+      const wy = (item.worldY || 0) + sy;
+      const p = worldToScreen(wx, wy);
+      const size = Math.max(1, state.scale);
+      el.style.left = p.x + 'px';
+      el.style.top = p.y + 'px';
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.hidden = false;
+    }
+    function positionPixelMarkerAtWorld(el, wx, wy){
+      if (!el) return;
+      const p = worldToScreen(wx, wy);
+      const size = Math.max(1, state.scale);
+      el.style.left = p.x + 'px';
+      el.style.top = p.y + 'px';
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.hidden = false;
+    }
+    function ensureBaseImageData(){
+      if (!img) return null;
+      const w = img.width|0, h = img.height|0;
+      if (baseImageData && baseImageData.width === w && baseImageData.height === h) return baseImageData;
+      try {
+        const off = document.createElement('canvas'); off.width = w; off.height = h;
+        const octx = off.getContext('2d', { willReadFrequently: true });
+        octx.drawImage(img, 0, 0);
+        baseImageData = octx.getImageData(0, 0, w, h);
+        return baseImageData;
+      } catch { return null; }
+    }
+
+    function isSameColorAsBase(item, sx, sy){
+      const itemId = ensureItemImageData(item);
+      const baseId = ensureBaseImageData();
+      if (!itemId || !baseId) return false;
+      
+      const wx = Math.round((item.worldX || 0) + sx);
+      const wy = Math.round((item.worldY || 0) + sy);
+      if (wx < 0 || wy < 0 || wx >= baseId.width || wy >= baseId.height) return false;
+      if (sx < 0 || sy < 0 || sx >= itemId.width || sy >= itemId.height) return false;
+      const iBase = ((baseId.width * wy + wx) << 2);
+      const iItem = ((itemId.width * sy + sx) << 2);
+      const a1 = itemId.data[iItem + 3];
+      if (a1 === 0) return false; 
+      const a0 = baseId.data[iBase + 3];
+      if (a0 === 0) return false; 
+      const r1 = itemId.data[iItem],   g1 = itemId.data[iItem+1], b1 = itemId.data[iItem+2];
+      const r0 = baseId.data[iBase],   g0 = baseId.data[iBase+1],  b0 = baseId.data[iBase+2];
+      return (r0 === r1) && (g0 === g1) && (b0 === b1);
+    }
+
+    function countPlacedPixelsForItem(item){
+      const itemId = ensureItemImageData(item);
+      const baseId = ensureBaseImageData();
+      if (!itemId || !baseId) return 0;
+      const wx0 = Math.round(item.worldX || 0);
+      const wy0 = Math.round(item.worldY || 0);
+      const nowMs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      const cache = item._placedCountCache;
+      if (cache && cache.baseW === baseId.width && cache.baseH === baseId.height && cache.wx0 === wx0 && cache.wy0 === wy0 && (nowMs - cache.atMs) < 1000) {
+        return cache.count;
+      }
+      let count = 0;
+      const w = itemId.width|0, h = itemId.height|0;
+      const itemData = itemId.data, baseData = baseId.data;
+      for (let y = 0; y < h; y++){
+        const wy = wy0 + y;
+        if (wy < 0 || wy >= baseId.height) continue;
+        for (let x = 0; x < w; x++){
+          const wx = wx0 + x;
+          if (wx < 0 || wx >= baseId.width) continue;
+          const iItem = ((w * y + x) << 2);
+          const a1 = itemData[iItem + 3];
+          if (a1 === 0) continue;
+          const iBase = ((baseId.width * wy + wx) << 2);
+          const a0 = baseData[iBase + 3];
+          if (a0 === 0) continue;
+          if (itemData[iItem] === baseData[iBase] && itemData[iItem+1] === baseData[iBase+1] && itemData[iItem+2] === baseData[iBase+2]) {
+            count++;
+          }
+        }
+      }
+      item._placedCountCache = { count, wx0, wy0, baseW: baseId.width, baseH: baseId.height, atMs: nowMs };
+      return count;
+    }
+
+    function snapItemToNearest(item, targetX, targetY){
+      const baseId = ensureBaseImageData();
+      const id = ensureItemImageData(item);
+      
+      if (!img) {
+        return { x: Math.round(targetX || 0), y: Math.round(targetY || 0) };
+      }
+      if (!id || !baseId) {
+        const maxXFallback = Math.max(0, img.width - (id && id.width ? id.width : 0));
+        const maxYFallback = Math.max(0, img.height - (id && id.height ? id.height : 0));
+        const rxFallback = Math.round(Math.min(Math.max(0, targetX), maxXFallback));
+        const ryFallback = Math.round(Math.min(Math.max(0, targetY), maxYFallback));
+        return { x: rxFallback, y: ryFallback };
+      }
+      const maxX = Math.max(0, img.width - id.width);
+      const maxY = Math.max(0, img.height - id.height);
+      const rx = Math.round(Math.min(Math.max(0, targetX), maxX));
+      const ry = Math.round(Math.min(Math.max(0, targetY), maxY));
+      let bestX = rx, bestY = ry, bestScore = -1;
+      const radius = 2;
+      const minX = Math.max(0, rx - radius), maxXn = Math.min(maxX, rx + radius);
+      const minY = Math.max(0, ry - radius), maxYn = Math.min(maxY, ry + radius);
+      const stride = Math.max(1, Math.floor(Math.min(id.width, id.height) / 64));
+      for (let oy = minY; oy <= maxYn; oy++) {
+        for (let ox = minX; ox <= maxXn; ox++) {
+          let score = 0;
+          for (let sy = 0; sy < id.height; sy += stride) {
+            const by = oy + sy; if (by < 0 || by >= baseId.height) continue;
+            let iItem = ((id.width * sy) << 2);
+            let iBase = ((baseId.width * by) << 2) + (ox << 2);
+            for (let sx = 0; sx < id.width; sx += stride) {
+              const a = id.data[iItem + 3];
+              if (a !== 0) {
+                const r1 = id.data[iItem], g1 = id.data[iItem+1], b1 = id.data[iItem+2];
+                const bx = ox + sx; if (bx >= 0 && bx < baseId.width) {
+                  const r0 = baseId.data[iBase], g0 = baseId.data[iBase+1], b0 = baseId.data[iBase+2];
+                  if (r0 === r1 && g0 === g1 && b0 === b1) score++;
+                }
+              }
+              iItem += (stride << 2);
+              iBase += (stride << 2);
+            }
+          }
+          if (score > bestScore) { bestScore = score; bestX = ox; bestY = oy; }
+        }
+      }
+      return { x: bestX, y: bestY };
+    }
+
+    function hideEl(el){ try { if (el) el.hidden = true; } catch {} }
+
+    function updatePixelMarkers(){
+      const hideHover = !!(state.dragging || state.zooming);
+      if (!isReadyOpen()) {
+        hideEl(pixelHoverEl);
+        try { pixelHoverFillEl.hidden = true; } catch {}
+        if (pixelSelectedList) pixelSelectedList.hidden = true;
+        return;
+      }
+      if (readyGlobalMode) {
+        
+        try {
+          readyGlobalSelected.forEach(rec => {
+            if (rec.fillEl) positionPixelMarkerAtWorld(rec.fillEl, rec.wx, rec.wy);
+            if (rec.el) positionPixelMarkerAtWorld(rec.el, rec.wx, rec.wy);
+          });
+        } catch {}
+        
+        try { if (!hideHover) { pixelHoverEl.hidden = false; pixelHoverEl.src = HOVER_ICON_SRC; } else { hideEl(pixelHoverEl); } } catch {}
+        try {
+          if (!hideHover && selectedOverrideColorId != null && selectedOverrideColorId !== 0 && readyHoverPixel && readyHoverPixel.x != null && readyHoverPixel.y != null) {
+            pixelHoverFillEl.src = getMarkerSrcForColorId(selectedOverrideColorId);
+            positionPixelMarkerAtWorld(pixelHoverFillEl, readyHoverPixel.x, readyHoverPixel.y);
+            pixelHoverFillEl.hidden = false;
+          } else {
+            pixelHoverFillEl.hidden = true;
+          }
+        } catch {}
+        
+        try {
+          const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+          if (sel) {
+            const map = getSelectedMap(sel);
+            if (map) map.forEach(rec => {
+              if (rec && rec.fillEl) positionPixelMarker(rec.fillEl, sel, rec.x, rec.y);
+              if (rec && rec.el) positionPixelMarker(rec.el, sel, rec.x, rec.y);
+            });
+            if (pixelSelectedList) pixelSelectedList.hidden = (readyGlobalSelected.size === 0) && (!map || map.size === 0);
+          } else {
+            if (pixelSelectedList) pixelSelectedList.hidden = readyGlobalSelected.size === 0;
+          }
+        } catch {}
+        return;
+      }
+      const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+      if (!sel || !sel.image || !sel.image.complete) { hideEl(pixelHoverEl); try { pixelHoverFillEl.hidden = true; } catch {}; if (pixelSelectedList) pixelSelectedList.hidden = true; return; }
+      ensureRenderedSelectedForItem(sel);
+      positionSelectedMarkersForItem(sel);
+      
+      try {
+        if (readyGlobalSelected && readyGlobalSelected.size > 0) {
+          readyGlobalSelected.forEach(rec => {
+            if (rec.fillEl) positionPixelMarkerAtWorld(rec.fillEl, rec.wx, rec.wy);
+            if (rec.el) positionPixelMarkerAtWorld(rec.el, rec.wx, rec.wy);
+          });
+        }
+      } catch {}
+      if (pixelSelectedList) {
+        const perImageCount = getSelectedMap(sel).size;
+        const globalCount = readyGlobalSelected ? readyGlobalSelected.size : 0;
+        pixelSelectedList.hidden = (perImageCount + globalCount) === 0;
+      }
+      if (!hideHover && readyHoverPixel && readyHoverPixel.x != null && readyHoverPixel.y != null) {
+        positionPixelMarker(pixelHoverEl, sel, readyHoverPixel.x, readyHoverPixel.y);
+        try {
+          if (!hideHover && selectedOverrideColorId != null && selectedOverrideColorId !== 0) {
+            pixelHoverFillEl.src = getMarkerSrcForColorId(selectedOverrideColorId);
+            positionPixelMarker(pixelHoverFillEl, sel, readyHoverPixel.x, readyHoverPixel.y);
+            pixelHoverFillEl.hidden = false;
+          } else {
+            pixelHoverFillEl.hidden = true;
+          }
+        } catch {}
+      } else {
+        hideEl(pixelHoverEl);
+        try { pixelHoverFillEl.hidden = true; } catch {}
+      }
+    }
+
+    function updateReadyHoverFromEvent(e){
+      if (!isReadyOpen()) { hideEl(pixelHoverEl); return; }
+      
+      try {
+        const t = e && e.target ? e.target : null;
+        const overUi = !!(t && t.closest && (
+          t.closest('#control-panel') ||
+          t.closest('#ready-popup') ||
+          t.closest('#sidebar') ||
+          t.closest('#color-palette')
+        ));
+        if (overUi) {
+          readyHoverPixel.x = null; readyHoverPixel.y = null;
+          hideEl(pixelHoverEl);
+          try { pixelHoverFillEl.hidden = true; } catch {}
+          return;
+        }
+      } catch {}
+      if (readyGlobalMode) {
+        const rect = canvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const worldX = (px - state.translateX) / state.scale;
+        const worldY = (py - state.translateY) / state.scale;
+        const wx = Math.floor(worldX);
+        const wy = Math.floor(worldY);
+        
+        if (img && wx >= 0 && wy >= 0 && wx < img.width && wy < img.height) {
+          readyHoverPixel.x = wx; readyHoverPixel.y = wy;
+          try { pixelHoverEl.src = HOVER_ICON_SRC; positionPixelMarkerAtWorld(pixelHoverEl, wx, wy); pixelHoverEl.hidden = false; } catch {}
+          try {
+            if (selectedOverrideColorId != null && selectedOverrideColorId !== 0) {
+              pixelHoverFillEl.src = getMarkerSrcForColorId(selectedOverrideColorId);
+              positionPixelMarkerAtWorld(pixelHoverFillEl, wx, wy);
+              pixelHoverFillEl.hidden = false;
+            } else {
+              pixelHoverFillEl.hidden = true;
+            }
+          } catch {}
+        } else {
+          readyHoverPixel.x = null; readyHoverPixel.y = null; hideEl(pixelHoverEl); try { pixelHoverFillEl.hidden = true; } catch {}
+        }
+        return;
+      }
+      const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+      if (!sel || !sel.image || !sel.image.complete) { hideEl(pixelHoverEl); return; }
+      try { pixelHoverEl.src = HOVER_ICON_SRC; } catch {}
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const worldX = (px - state.translateX) / state.scale;
+      const worldY = (py - state.translateY) / state.scale;
+      const lx = Math.floor(worldX - (sel.worldX || 0));
+      const ly = Math.floor(worldY - (sel.worldY || 0));
+      if (lx >= 0 && ly >= 0 && lx < sel.image.naturalWidth && ly < sel.image.naturalHeight && isOpaquePixel(sel, lx, ly)) {
+        readyHoverPixel.x = lx; readyHoverPixel.y = ly;
+        positionPixelMarker(pixelHoverEl, sel, lx, ly);
+        try {
+          if (selectedOverrideColorId != null && selectedOverrideColorId !== 0) {
+            pixelHoverFillEl.src = getMarkerSrcForColorId(selectedOverrideColorId);
+            positionPixelMarker(pixelHoverFillEl, sel, lx, ly);
+            pixelHoverFillEl.hidden = false;
+          } else {
+            pixelHoverFillEl.hidden = true;
+          }
+        } catch {}
+      } else {
+        readyHoverPixel.x = null; readyHoverPixel.y = null; hideEl(pixelHoverEl); try { pixelHoverFillEl.hidden = true; } catch {}
+      }
+    }
+
+    
+    const PALETTE = [
+      { id: 1, rgb: [0, 0, 0] },
+      { id: 2, rgb: [60, 60, 60] },
+      { id: 3, rgb: [120, 120, 120] },
+      { id: 4, rgb: [210, 210, 210] },
+      { id: 5, rgb: [255, 255, 255] },
+      { id: 6, rgb: [96, 0, 24] },
+      { id: 7, rgb: [237, 28, 36] },
+      { id: 8, rgb: [255, 127, 39] },
+      { id: 9, rgb: [246, 170, 9] },
+      { id: 10, rgb: [249, 221, 59] },
+      { id: 11, rgb: [255, 250, 188] },
+      { id: 12, rgb: [14, 185, 104] },
+      { id: 13, rgb: [19, 230, 123] },
+      { id: 14, rgb: [135, 255, 94] },
+      { id: 15, rgb: [12, 129, 110] },
+      { id: 16, rgb: [16, 174, 166] },
+      { id: 17, rgb: [19, 225, 190] },
+      { id: 18, rgb: [40, 80, 158] },
+      { id: 19, rgb: [64, 147, 228] },
+      { id: 20, rgb: [96, 247, 242] },
+      { id: 21, rgb: [107, 80, 246] },
+      { id: 22, rgb: [153, 177, 251] },
+      { id: 23, rgb: [120, 12, 153] },
+      { id: 24, rgb: [170, 56, 185] },
+      { id: 25, rgb: [224, 159, 249] },
+      { id: 26, rgb: [203, 0, 122] },
+      { id: 27, rgb: [236, 31, 128] },
+      { id: 28, rgb: [243, 141, 169] },
+      { id: 29, rgb: [104, 70, 52] },
+      { id: 30, rgb: [149, 104, 42] },
+      { id: 31, rgb: [248, 178, 119] }
+    ];
+    function setupColorPalette(){
+      if (!colorPaletteEl) return;
+      colorPaletteEl.innerHTML = '';
+      
+      const swT = document.createElement('div');
+      swT.className = 'palette-swatch transparent selected';
+      swT.title = t('palette.transparentTitle');
+      swT.setAttribute('role', 'button');
+      swT.addEventListener('click', () => {
+        try {
+          const rp = document.getElementById('ready-popup');
+          const wasReadyOpen = !!(rp && !rp.hidden);
+          const wasGlobal = !!readyGlobalMode;
+          const hadGlobalSelections = !!(readyGlobalSelected && readyGlobalSelected.size > 0);
+          selectedOverrideColorId = null;
+          
+          readyGlobalMode = false;
+          // Switch back to per-image mode without generic resets
+          updatePaletteSelectionUi();
+          try { updateReadyButtonEnabled(); } catch {}
+          try { updateReadySelectionLabel(); } catch {}
+          try { updatePixelMarkers(); } catch {}
+          // Special case: If Ready is open and user was in global color mode and had placed selections,
+          // clear ONLY global selections and close the Ready popup
+          if (wasReadyOpen && wasGlobal && hadGlobalSelections) {
+            try {
+              readyGlobalSelected.forEach(rec => {
+                try { if (rec && rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); } catch {}
+                try { if (rec && rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl); } catch {}
+              });
+              readyGlobalSelected.clear();
+            } catch {}
+            try { resetReadyNow(); } catch {}
+          }
+        } catch {
+          selectedOverrideColorId = null;
+          readyGlobalMode = false;
+          updatePaletteSelectionUi();
+          try { updateReadyButtonEnabled(); } catch {}
+          try { updateReadySelectionLabel(); } catch {}
+          try { updatePixelMarkers(); } catch {}
+        }
+      });
+      colorPaletteEl.appendChild(swT);
+      
+      for (let i = 0; i < PALETTE.length; i++){
+        const p = PALETTE[i];
+        const el = document.createElement('div');
+        el.className = 'palette-swatch';
+        el.style.backgroundColor = 'rgb(' + p.rgb[0] + ',' + p.rgb[1] + ',' + p.rgb[2] + ')';
+        el.title = t('palette.colorTitle', { id: p.id });
+        el.setAttribute('data-id', String(p.id));
+        el.setAttribute('role', 'button');
+        el.addEventListener('click', () => {
+          selectedOverrideColorId = p.id;
+          
+          try {
+            const rp = document.getElementById('ready-popup');
+            if (rp && !rp.hidden) {
+              const hasSelectedSign = (selectedIndex >= 0 && selectedIndex < signItems.length);
+              // Enable global mode only if no image is selected; otherwise stay in per-image mode
+              readyGlobalMode = !hasSelectedSign;
+            }
+          } catch {}
+          updatePaletteSelectionUi();
+          try { updateReadyButtonEnabled(); } catch {}
+          try { updateReadySelectionLabel(); } catch {}
+          try { updatePixelMarkers(); } catch {}
+        });
+        colorPaletteEl.appendChild(el);
+      }
+      // Block (remove) swatch → sends color id 0 and shows no fill overlay
+      const swB = document.createElement('div');
+      swB.className = 'palette-swatch block';
+      swB.title = 'Block';
+      swB.setAttribute('role', 'button');
+      swB.setAttribute('data-id', '0');
+      swB.textContent = '⛔';
+      swB.addEventListener('click', () => {
+        selectedOverrideColorId = 0;
+        
+        try {
+          const rp = document.getElementById('ready-popup');
+          if (rp && !rp.hidden) {
+            const hasSelectedSign = (selectedIndex >= 0 && selectedIndex < signItems.length);
+            readyGlobalMode = !hasSelectedSign;
+          }
+        } catch {}
+        updatePaletteSelectionUi();
+        try { updateReadyButtonEnabled(); } catch {}
+        try { updateReadySelectionLabel(); } catch {}
+        try { updatePixelMarkers(); } catch {}
+      });
+      colorPaletteEl.appendChild(swB);
+      updatePaletteSelectionUi();
+    }
+    function updateReadyButtonEnabled(){
+      try {
+        const btn = document.getElementById('btn-ready');
+        if (!btn) return;
+        btn.disabled = !(
+          (selectedIndex >= 0 && selectedIndex < signItems.length) ||
+          (selectedOverrideColorId != null)
+        );
+      } catch {}
+    }
+    function openReadyOnPaletteClick(){  }
+    function updatePaletteSelectionUi(){
+      if (!colorPaletteEl) return;
+      const swatches = Array.from(colorPaletteEl.querySelectorAll('.palette-swatch'));
+      swatches.forEach(sw => {
+        const idAttr = sw.getAttribute('data-id');
+        const id = idAttr == null ? null : Number(idAttr);
+        const isSelected = (idAttr == null && selectedOverrideColorId == null) || (idAttr != null && id === selectedOverrideColorId);
+        sw.classList.toggle('selected', !!isSelected);
+      });
+    }
+
+    function squaredDistance(r1,g1,b1, r2,g2,b2){
+      const dr=r1-r2, dg=g1-g2, db=b1-b2; return dr*dr+dg*dg+db*db;
+    }
+    
+    function srgbToOklab(r, g, b){
+      const sr = r / 255, sg = g / 255, sb = b / 255;
+      const toLin = (u) => (u <= 0.04045) ? (u / 12.92) : Math.pow((u + 0.055) / 1.055, 2.4);
+      const lr = toLin(sr), lg = toLin(sg), lb = toLin(sb);
+      const l_ = 0.4122214708*lr + 0.5363325363*lg + 0.0514459929*lb;
+      const m_ = 0.2119034982*lr + 0.6806995451*lg + 0.1073969566*lb;
+      const s_ = 0.0883024619*lr + 0.2817188376*lg + 0.6299787005*lb;
+      const l = Math.cbrt(l_), m = Math.cbrt(m_), s = Math.cbrt(s_);
+      const L = 0.2104542553*l + 0.7936177850*m - 0.0040720468*s;
+      const A = 1.9779984951*l - 2.4285922050*m + 0.4505937099*s;
+      const B = 0.0259040371*l + 0.7827717662*m - 0.8086757660*s;
+      return [L, A, B];
+    }
+    const PALETTE_OKLAB = (() => {
+      const arr = [];
+      for (let i = 0; i < PALETTE.length; i++){
+        const p = PALETTE[i];
+        const lab = srgbToOklab(p.rgb[0], p.rgb[1], p.rgb[2]);
+        arr.push({ id: p.id, lab });
+      }
+      return arr;
+    })();
+    function nearestPaletteRgb(r,g,b){
+      const lab = srgbToOklab(r,g,b);
+      let best = PALETTE[0].rgb, bestD = Infinity;
+      for (let i = 0; i < PALETTE_OKLAB.length; i++){
+        const q = PALETTE_OKLAB[i].lab;
+        const dL = lab[0]-q[0], dA = lab[1]-q[1], dB = lab[2]-q[2];
+        const d = dL*dL + dA*dA + dB*dB;
+        if (d < bestD){ bestD = d; best = PALETTE[i].rgb; if (d === 0) break; }
+      }
+      return best;
+    }
+    
+    const EXACT_PALETTE_MAP = (() => {
+      const m = new Map();
+      for (let i = 0; i < PALETTE.length; i++) {
+        const p = PALETTE[i];
+        m.set(String(p.rgb[0]) + ',' + String(p.rgb[1]) + ',' + String(p.rgb[2]), p.id);
+      }
+      return m;
+    })();
+    function nearestPaletteId(r,g,b){
+      const lab = srgbToOklab(r,g,b);
+      let bestId = PALETTE[0].id;
+      let bestD = Infinity;
+      for (let i = 0; i < PALETTE_OKLAB.length; i++){
+        const q = PALETTE_OKLAB[i].lab;
+        const dL = lab[0]-q[0], dA = lab[1]-q[1], dB = lab[2]-q[2];
+        const d = dL*dL + dA*dA + dB*dB;
+        if (d < bestD){ bestD = d; bestId = PALETTE[i].id; if (d === 0) break; }
+      }
+      return bestId;
+    }
+    function rgbToPaletteId(r,g,b){
+      const key = String(r) + ',' + String(g) + ',' + String(b);
+      if (EXACT_PALETTE_MAP.has(key)) return EXACT_PALETTE_MAP.get(key);
+      return nearestPaletteId(r,g,b);
+    }
+    function quantizeImageToPalette(image){
+      const w=image.naturalWidth|0, h=image.naturalHeight|0;
+      const off=document.createElement('canvas'); off.width=w; off.height=h;
+      const octx=off.getContext('2d', { willReadFrequently: true });
+      octx.imageSmoothingEnabled = false;
+      octx.drawImage(image,0,0);
+      const id=octx.getImageData(0,0,w,h);
+      const data=id.data;
+      
+      const w2 = w + 2;
+      const errCurrR = new Float32Array(w2), errCurrG = new Float32Array(w2), errCurrB = new Float32Array(w2);
+      const errNextR = new Float32Array(w2), errNextG = new Float32Array(w2), errNextB = new Float32Array(w2);
+      for (let y = 0; y < h; y++) {
+        const leftToRight = (y % 2 === 0);
+        
+        for (let i = 0; i < w2; i++) { errCurrR[i] += 0; errCurrG[i] += 0; errCurrB[i] += 0; }
+        
+        if (leftToRight) {
+          for (let x = 0; x < w; x++) {
+            const idx = (y * w + x) * 4;
+            const a = data[idx + 3]; if (a === 0) continue;
+            let r = data[idx] + errCurrR[x+1];
+            let g = data[idx+1] + errCurrG[x+1];
+            let b = data[idx+2] + errCurrB[x+1];
+            r = r < 0 ? 0 : (r > 255 ? 255 : r);
+            g = g < 0 ? 0 : (g > 255 ? 255 : g);
+            b = b < 0 ? 0 : (b > 255 ? 255 : b);
+            const nn = nearestPaletteRgb(r, g, b);
+            data[idx] = nn[0]; data[idx+1] = nn[1]; data[idx+2] = nn[2];
+            const er = r - nn[0];
+            const eg = g - nn[1];
+            const eb = b - nn[2];
+            
+            errCurrR[x+2] += er * (7/16); errCurrG[x+2] += eg * (7/16); errCurrB[x+2] += eb * (7/16);
+            errNextR[x  ] += er * (3/16); errNextG[x  ] += eg * (3/16); errNextB[x  ] += eb * (3/16);
+            errNextR[x+1] += er * (5/16); errNextG[x+1] += eg * (5/16); errNextB[x+1] += eb * (5/16);
+            errNextR[x+2] += er * (1/16); errNextG[x+2] += eg * (1/16); errNextB[x+2] += eb * (1/16);
+          }
+        } else {
+          for (let x = w - 1; x >= 0; x--) {
+            const idx = (y * w + x) * 4;
+            const a = data[idx + 3]; if (a === 0) continue;
+            let r = data[idx] + errCurrR[x+1];
+            let g = data[idx+1] + errCurrG[x+1];
+            let b = data[idx+2] + errCurrB[x+1];
+            r = r < 0 ? 0 : (r > 255 ? 255 : r);
+            g = g < 0 ? 0 : (g > 255 ? 255 : g);
+            b = b < 0 ? 0 : (b > 255 ? 255 : b);
+            const nn = nearestPaletteRgb(r, g, b);
+            data[idx] = nn[0]; data[idx+1] = nn[1]; data[idx+2] = nn[2];
+            const er = r - nn[0];
+            const eg = g - nn[1];
+            const eb = b - nn[2];
+            
+            errCurrR[x  ] += er * (7/16); errCurrG[x  ] += eg * (7/16); errCurrB[x  ] += eb * (7/16);
+            errNextR[x+2] += er * (3/16); errNextG[x+2] += eg * (3/16); errNextB[x+2] += eb * (3/16);
+            errNextR[x+1] += er * (5/16); errNextG[x+1] += eg * (5/16); errNextB[x+1] += eb * (5/16);
+            errNextR[x  ] += er * (1/16); errNextG[x  ] += eg * (1/16); errNextB[x  ] += eb * (1/16);
+          }
+        }
+        
+        for (let i = 0; i < w2; i++) { errCurrR[i] = errNextR[i]; errCurrG[i] = errNextG[i]; errCurrB[i] = errNextB[i]; errNextR[i]=0; errNextG[i]=0; errNextB[i]=0; }
+      }
+      octx.putImageData(id,0,0);
+      return new Promise((resolve)=>{ off.toBlob((blob)=>resolve(blob), 'image/png'); });
+    }
+
+    
+    function countNonTransparentPixels(image){
+      try {
+        const w=image.naturalWidth|0, h=image.naturalHeight|0;
+        if (!w || !h) return 0;
+        const off=document.createElement('canvas'); off.width=w; off.height=h;
+        const octx=off.getContext('2d', { willReadFrequently: true });
+        octx.drawImage(image,0,0);
+        const id=octx.getImageData(0,0,w,h);
+        const data=id.data;
+        let cnt=0;
+        for(let i=3;i<data.length;i+=4){ if(data[i]!==0) cnt++; }
+        return cnt;
+      } catch { return 0; }
+    }
+
+    
+    const PIXEL_FONT_5x7 = {
+      '0': [
+        '01110','10001','10011','10101','11001','10001','01110'
+      ],
+      '1': [
+        '00100','01100','00100','00100','00100','00100','01110'
+      ],
+      '2': [
+        '01110','10001','00001','00010','00100','01000','11111'
+      ],
+      '3': [
+        '11110','00001','00001','01110','00001','00001','11110'
+      ],
+      '4': [
+        '00010','00110','01010','10010','11111','00010','00010'
+      ],
+      '5': [
+        '11111','10000','11110','00001','00001','10001','01110'
+      ],
+      '6': [
+        '00110','01000','10000','11110','10001','10001','01110'
+      ],
+      '7': [
+        '11111','00001','00010','00100','01000','01000','01000'
+      ],
+      '8': [
+        '01110','10001','10001','01110','10001','10001','01110'
+      ],
+      '9': [
+        '01110','10001','10001','01111','00001','00010','11100'
+      ],
+      'p': [
+        '11110','10001','10001','11110','10000','10000','10000'
+      ],
+      'i': [
+        '00100','00000','01100','00100','00100','00100','01110'
+      ],
+      'x': [
+        '10001','01010','00100','01010','10001','00000','00000'
+      ],
+      'e': [
+        '01110','10000','11110','10000','10000','10001','01110'
+      ],
+      'l': [
+        '10000','10000','10000','10000','10000','10000','11111'
+      ],
+      ' ': [
+        '00000','00000','00000','00000','00000','00000','00000'
+      ],
+      '/': [
+        '00001','00010','00100','01000','10000','00000','00000'
+      ],
+      '-': [
+        '00000','00000','00000','11111','00000','00000','00000'
+      ],
+      '.': [
+        '00000','00000','00000','00000','00000','00100','00100'
+      ],
+      '%': [
+        '10001','00010','00100','01000','10000','10001','00000'
+      ]
+    };
+
+    function measurePixelText(text, pixelSize){
+      const glyphW = 5, glyphH = 7, space = 1;
+      const cellsW = Math.max(0, text.length * (glyphW + space) - space);
+      return { width: cellsW * pixelSize, height: glyphH * pixelSize };
+    }
+
+    function drawPixelText(ctx, text, x, y, pixelSize, color){
+      const glyphW = 5, glyphH = 7, space = 1;
+      let cx = x;
+      ctx.save();
+      ctx.fillStyle = color || '#fff';
+      for(let k=0;k<text.length;k++){
+        const ch = text[k].toLowerCase();
+        const g = PIXEL_FONT_5x7[ch] || PIXEL_FONT_5x7[' '];
+        for(let r=0;r<glyphH;r++){
+          const row = g[r] || '00000';
+          for(let c=0;c<glyphW;c++){
+            if (row[c] === '1') ctx.fillRect(cx + c*pixelSize, y + r*pixelSize, pixelSize, pixelSize);
+          }
+        }
+        cx += (glyphW + space) * pixelSize;
+      }
+      ctx.restore();
+    }
+
+    
+    const PIX_ICON_LOCK_CLOSED = [
+      '0011100',
+      '0100010',
+      '0100010',
+      '0111110',
+      '0110110',
+      '0110110',
+      '0111110'
+    ];
+    const PIX_ICON_LOCK_OPEN = [
+      '0011000',
+      '0100000',
+      '0100000',
+      '0111110',
+      '0110110',
+      '0110110',
+      '0111110'
+    ];
+    const PIX_ICON_X = [
+      '1000001',
+      '0100010',
+      '0010100',
+      '0001000',
+      '0010100',
+      '0100010',
+      '1000001'
+    ];
+    function drawPixelIcon(ctx, pattern, x, y, pixelSize, color){
+      ctx.save();
+      ctx.fillStyle = color || '#ffffff';
+      const h = pattern.length|0;
+      const w = h ? pattern[0].length|0 : 0;
+      for (let r = 0; r < h; r++){
+        const row = pattern[r] || '';
+        for (let c = 0; c < w; c++){
+          if (row[c] === '1') ctx.fillRect(x + c*pixelSize, y + r*pixelSize, pixelSize, pixelSize);
+        }
+      }
+      ctx.restore();
+    }
+    function measurePixelIcon(pattern, pixelSize){
+      const h = pattern.length|0;
+      const w = h ? pattern[0].length|0 : 0;
+      return { width: w * pixelSize, height: h * pixelSize };
+    }
+
+    function getContentCenterPx() {
+      const c = canvas.getBoundingClientRect();
+      const s = sidebar && sidebar.getBoundingClientRect ? sidebar.getBoundingClientRect() : null;
+      const regionLeft = s ? Math.max(0, Math.min(c.width, s.right - c.left)) : 0;
+      return { x: regionLeft + (c.width - regionLeft) / 2, y: c.height / 2 };
+    }
+
+    let img = null;
+    let baseImageData = null;
+    const state = {
+      scale: 1,
+      minScale: 0.1,
+      maxScale: 16,
+      translateX: 0,
+      translateY: 0,
+      dragging: false,
+      lastX: 0,
+      lastY: 0,
+      zooming: false
+    };
+    let zoomingTimeout = null;
+
+    function resizeCanvasToDisplaySize() {
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = Math.floor(canvas.clientWidth * dpr);
+      const displayHeight = Math.floor(canvas.clientHeight * dpr);
+      if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+      }
+      return dpr;
+    }
+
+    function render() {
+      if (!img) return;
+      const dpr = resizeCanvasToDisplaySize();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      ctx.imageSmoothingEnabled = false;
+      ctx.setTransform(dpr * state.scale, 0, 0, dpr * state.scale, dpr * state.translateX, dpr * state.translateY);
+      ctx.drawImage(img, 0, 0);
+      
+      let dimSelectedWhileReadyOpen = false;
+      try {
+        const rp = document.getElementById('ready-popup');
+        dimSelectedWhileReadyOpen = !!(rp && !rp.hidden);
+      } catch {}
+      for (let i = 0; i < signItems.length; i++) {
+        const it = signItems[i];
+        if (it.image && it.image.complete) {
+          const wx = typeof it.worldX === 'number' ? it.worldX : 0;
+          const wy = typeof it.worldY === 'number' ? it.worldY : 0;
+          ctx.save();
+          if (i !== selectedIndex || dimSelectedWhileReadyOpen) {
+            ctx.globalAlpha = 0.70;
+            ctx.filter = 'saturate(0.6)';
+          } else {
+            ctx.globalAlpha = 1;
+            ctx.filter = 'none';
+          }
+          ctx.drawImage(it.image, wx, wy);
+          ctx.restore();
+        }
+      }
+      
+      if (!dimSelectedWhileReadyOpen && selectedIndex >= 0 && selectedIndex < signItems.length) {
+        const it = signItems[selectedIndex];
+        if (it && it.image && it.image.complete) {
+          const wx = (typeof it.worldX === 'number' ? it.worldX : 0);
+          const wy = (typeof it.worldY === 'number' ? it.worldY : 0);
+          const totalCount = (it && it.pixelCount != null) ? Number(it.pixelCount) : 0;
+          let selectedCount = 0;
+          try {
+            const map = getSelectedMap(it);
+            selectedCount = map ? map.size : 0;
+          } catch {}
+          const placedCount = countPlacedPixelsForItem(it);
+          const label = String(placedCount) + '/' + String(totalCount) + ' PX - ' + String((totalCount > 0 ? (placedCount / totalCount * 100) : 0).toFixed(1)) + ' %';
+          // Scale UI relative to image size: baseline = 100x100 → scale = 1 (capped at 5x)
+          const uiScale = Math.min(5, Math.max(0.1, Math.max(it.image.naturalWidth, it.image.naturalHeight) / 100));
+          const pixelSize = 0.2 * uiScale;
+          const padding = Math.max(0.2 * uiScale, Math.floor((0.5 * uiScale) / state.scale));
+          const offset = 1 * uiScale;
+          const m = measurePixelText(label, pixelSize);
+          ctx.save();
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(wx + offset - padding, wy + offset - padding, m.width + padding * 2, m.height + padding * 2);
+          drawPixelText(ctx, label, wx + offset, wy + offset, pixelSize, '#ffffff');
+          ctx.restore();
+        }
+      }
+      const sel = signItems[selectedIndex];
+      if (sel && sel.image && sel.image.complete && !dimSelectedWhileReadyOpen) {
+        ctx.save();
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 2 / state.scale;
+        ctx.setLineDash([6 / state.scale, 6 / state.scale]);
+        ctx.strokeRect(sel.worldX || 0, sel.worldY || 0, sel.image.naturalWidth, sel.image.naturalHeight);
+        ctx.restore();
+        
+        const wx0 = (sel.worldX || 0);
+        const wy0 = (sel.worldY || 0);
+        // Scale lock/close icons relative to image size: baseline = 100x100 → scale = 1 (capped at 5x)
+        const uiScale2 = Math.min(5, Math.max(0.1, Math.max(sel.image.naturalWidth, sel.image.naturalHeight) / 100));
+        const pixelSize = 0.6 * uiScale2;
+        const padding = Math.max(0.3 * uiScale2, Math.floor((0.5 * uiScale2) / state.scale));
+        const gap = padding * 10; 
+        const off = 1 * uiScale2;
+        const lockPattern = sel.locked ? PIX_ICON_LOCK_CLOSED : PIX_ICON_LOCK_OPEN;
+        const lockSize = measurePixelIcon(lockPattern, pixelSize);
+        const delSize = measurePixelIcon(PIX_ICON_X, pixelSize);
+        const lockBgW = lockSize.width + padding * 2;
+        const delBgW = delSize.width + padding * 2;
+        const bgH = Math.max(lockSize.height, delSize.height) + padding * 2;
+        const totalW = lockBgW + delBgW + gap;
+        let xRight = wx0 + sel.image.naturalWidth - off - totalW;
+        let yTop = wy0 + off;
+        
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        const xLockBg = xRight;
+        const xDelBg = xLockBg + lockBgW + gap;
+        ctx.fillRect(xLockBg, yTop, lockBgW, bgH);
+        ctx.fillRect(xDelBg, yTop, delBgW, bgH);
+        
+        const xLockIcon = xLockBg + padding;
+        const yIcons = yTop + padding;
+        drawPixelIcon(ctx, lockPattern, xLockIcon, yIcons, pixelSize, '#ffffff');
+        
+        const xDelIcon = xDelBg + padding;
+        drawPixelIcon(ctx, PIX_ICON_X, xDelIcon, yIcons, pixelSize, '#ffffff');
+        ctx.restore();
+        
+        sel._overlayRects = {
+          lock: { x: xLockIcon, y: yIcons, w: lockSize.width, h: lockSize.height },
+          del: { x: xDelIcon, y: yIcons, w: delSize.width, h: delSize.height },
+          bg: { x: xRight, y: yTop, w: totalW, h: bgH }
+        };
+      }
+      
+      try { updatePixelMarkers(); } catch {}
+    }
+
+    function fitToView() {
+      if (!img) return;
+      const vw = canvas.clientWidth;
+      const vh = canvas.clientHeight;
+      const scaleToFit = Math.min(vw / img.width, vh / img.height);
+      state.scale = scaleToFit;
+      state.translateX = (vw - img.width * state.scale) / 2;
+      state.translateY = (vh - img.height * state.scale) / 2;
+      render();
+    }
+
+    function reloadCurrentBackground() {
+      try {
+        const area = (areaInput && areaInput.value) ? String(areaInput.value).trim() : '';
+        const no = (noInput && noInput.value) ? String(noInput.value).trim() : '';
+        if (!area || !no) return;
+        
+        const url = buildUrl(area, no) + '?t=' + Date.now();
+        const image = new Image();
+        image.onload = () => {
+          img = image;
+          baseImageData = null;
+          try { signItems.forEach(it => { if (it) it._placedCountCache = null; }); } catch {}
+          render();
+          updatePixelMarkers();
+        };
+        image.onerror = () => {};
+        image.src = url;
+      } catch {}
+    }
+
+    const USE_LOCAL_TILE = false;
+    function buildUrl(area, no) {
+      if (USE_LOCAL_TILE) return '767.png';
+      
+      return '/tiles/' + encodeURIComponent(area) + '/' + encodeURIComponent(no) + '.png';
+    }
+
+    function loadImage(area, no) {
+      const url = buildUrl(area, no);
+      const image = new Image();
+      
+      image.onload = () => {
+        img = image;
+        try { baseImageData = null; } catch {}
+        
+        fitToView();
+      };
+      image.onerror = () => {
+        alert(t('messages.imageLoadFailed'));
+      };
+      image.src = url;
+    }
+
+    
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const worldX = (px - state.translateX) / state.scale;
+      const worldY = (py - state.translateY) / state.scale;
+      
+      if (isReadyOpen()) {
+        readyMouseDownPt = { screenX: e.clientX, screenY: e.clientY, worldX, worldY, button: e.button };
+        readyMouseMoved = false;
+      }
+
+      
+      let hitIndex = -1;
+      for (let i = signItems.length - 1; i >= 0; i--) {
+        const it = signItems[i];
+        if (!it || !it.image || !it.image.complete) continue;
+        const x = it.worldX || 0;
+        const y = it.worldY || 0;
+        const w = it.image.naturalWidth;
+        const h = it.image.naturalHeight;
+        if (worldX >= x && worldX <= x + w && worldY >= y && worldY <= y + h) {
+          hitIndex = i;
+          break;
+        }
+      }
+
+      if (!readyGlobalMode && hitIndex >= 0) {
+        selectedIndex = hitIndex;
+        
+        try {
+          const rp = document.getElementById('ready-popup');
+          if (rp && !rp.hidden && readyLockedItem && readyLockedItem !== signItems[selectedIndex]) {
+            readyLockedItem.lockedByReady = false;
+            try { updateItemLockUi(readyLockedItem); } catch {}
+            readyLockedItem = null;
+          }
+        } catch {}
+        updateThumbSelection();
+        updateCounter();
+        const it = signItems[selectedIndex];
+        
+        if (it && it._overlayRects) {
+          const rbg = it._overlayRects.bg;
+          if (rbg && worldX >= rbg.x && worldX <= rbg.x + rbg.w && worldY >= rbg.y && worldY <= rbg.y + rbg.h) {
+            const rLock = it._overlayRects.lock;
+            const rDel = it._overlayRects.del;
+            if (rLock && worldX >= rLock.x && worldX <= rLock.x + rLock.w && worldY >= rLock.y && worldY <= rLock.y + rLock.h) {
+              
+              it.locked = !it.locked;
+              try { updateItemLockUi(it); } catch {}
+              render();
+              return; 
+            }
+            if (rDel && worldX >= rDel.x && worldX <= rDel.x + rDel.w && worldY >= rDel.y && worldY <= rDel.y + rDel.h) {
+              
+              deleteItem(it);
+              render();
+              return; 
+            }
+          }
+        }
+        if (!(it.locked || it.lockedByReady)) {
+          signDragging = true;
+          signWorldOffsetX = worldX - (it.worldX || 0);
+          signWorldOffsetY = worldY - (it.worldY || 0);
+        }
+        render();
+        if (isReadyOpen()) {
+          
+          updateReadyHoverFromEvent(e);
+          updatePixelMarkers();
+        }
+      } else if (!readyGlobalMode) {
+        try {
+          const prev = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+          if (prev) clearSelectionsForItem(prev);
+        } catch {}
+        selectedIndex = -1;
+        try {
+          const rp = document.getElementById('ready-popup');
+          if (rp && !rp.hidden) {
+            resetReadyNow();
+          }
+        } catch {}
+        updateThumbSelection();
+        updateCounter();
+        state.dragging = true;
+        state.lastX = e.clientX;
+        state.lastY = e.clientY;
+        document.body.classList.add('dragging');
+        render();
+        updatePixelMarkers();
+      }
+    });
+    
+    canvas.addEventListener('contextmenu', (e) => { if (isReadyOpen()) { e.preventDefault(); } });
+    window.addEventListener('mousemove', (e) => {
+      if (isReadyOpen()) {
+        if (readyMouseDownPt) {
+          const moveDx = Math.abs(e.clientX - readyMouseDownPt.screenX);
+          const moveDy = Math.abs(e.clientY - readyMouseDownPt.screenY);
+          if (moveDx > READY_CLICK_MOVE_TOLERANCE || moveDy > READY_CLICK_MOVE_TOLERANCE) readyMouseMoved = true;
+        }
+      }
+      if (state.dragging) {
+        const dx = e.clientX - state.lastX;
+        const dy = e.clientY - state.lastY;
+        state.lastX = e.clientX;
+        state.lastY = e.clientY;
+        state.translateX += dx;
+        state.translateY += dy;
+        render();
+        updatePixelMarkers();
+        
+        const rect = canvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const worldX = (px - state.translateX) / state.scale;
+        const worldY = (py - state.translateY) / state.scale;
+        updateCanvasCursorAt(worldX, worldY);
+        return;
+      }
+      if (isReadyOpen()) {
+        try {
+          const t = e && e.target ? e.target : null;
+          const overUi = !!(t && t.closest && (
+            t.closest('#control-panel') ||
+            t.closest('#ready-popup') ||
+            t.closest('#sidebar') ||
+            t.closest('#color-palette')
+          ));
+          if (overUi) {
+            readyHoverPixel.x = null; readyHoverPixel.y = null;
+            hideEl(pixelHoverEl);
+            try { pixelHoverFillEl.hidden = true; } catch {}
+          } else {
+            updateReadyHoverFromEvent(e);
+          }
+        } catch { updateReadyHoverFromEvent(e); }
+      }
+      
+      
+      if (isReadyOpen() && readyMouseDownPt && !readyMouseMoved) {
+        return; 
+      }
+      
+      try {
+        const rect = canvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const worldX = (px - state.translateX) / state.scale;
+        const worldY = (py - state.translateY) / state.scale;
+        updateCanvasCursorAt(worldX, worldY);
+      } catch {}
+      
+      if (isReadyOpen() && readyMouseDownPt && readyMouseMoved && !state.dragging) {
+        state.dragging = true;
+        state.lastX = e.clientX;
+        state.lastY = e.clientY;
+        document.body.classList.add('dragging');
+      }
+      if (!signDragging) return;
+      if (isReadyOpen()) {
+        return;
+      }
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      let worldX = (px - state.translateX) / state.scale - signWorldOffsetX;
+      let worldY = (py - state.translateY) / state.scale - signWorldOffsetY;
+      const sel = signItems[selectedIndex];
+      if (sel && sel.image && img) {
+        const snapped = snapItemToNearest(sel, worldX, worldY);
+        sel.worldX = snapped.x;
+        sel.worldY = snapped.y;
+        
+        if (sel.pixelCount == null) {
+          try { sel.pixelCount = countNonTransparentPixels(sel.image); } catch {}
+        }
+        render();
+        updatePixelMarkers();
+        if (isReadyOpen()) { try { updateReadySelectionLabel(); } catch {} }
+      }
+    });
+    window.addEventListener('mouseup', (e) => {
+      if (isReadyOpen()) {
+        
+        if (readyMouseDownPt && !readyMouseMoved && e.button === 0) {
+          const hasAccounts = Array.isArray(readySelectedAccountIds) && readySelectedAccountIds.length > 0;
+          if (!hasAccounts) {
+            showToast(t('messages.selectAccountFirst'), 'error', 2000);
+            readyMouseDownPt = null; readyMouseMoved = false;
+            return;
+          }
+          const rect = canvas.getBoundingClientRect();
+          const px = e.clientX - rect.left;
+          const py = e.clientY - rect.top;
+          const worldX = (px - state.translateX) / state.scale;
+          const worldY = (py - state.translateY) / state.scale;
+          const wx = Math.floor(worldX);
+          const wy = Math.floor(worldY);
+          const area = (areaInput && areaInput.value) ? String(areaInput.value).trim() : '';
+          const no = (noInput && noInput.value) ? String(noInput.value).trim() : '';
+          
+          if (!img) {
+            readyMouseDownPt = null; readyMouseMoved = false;
+            return;
+          }
+          if (readyGlobalMode) {
+            if (wx >= 0 && wy >= 0 && wx < img.width && wy < img.height) {
+              const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+              if (limit > 0 && readyGlobalSelected.size >= limit) {
+                showToast(t('messages.maxPixelsReached', { limit }), 'error', 2000);
+                readyMouseDownPt = null; readyMouseMoved = false;
+                return;
+              }
+              const key = String(wx) + ',' + String(wy);
+              if (!readyGlobalSelected.has(key)) {
+                const el = document.createElement('img');
+                el.className = 'pixel-marker'; el.alt = 'selected'; el.src = SELECTED_ICON_SRC;
+                const rec = { wx, wy, el, fillEl: null, colorId: selectedOverrideColorId };
+                if (selectedOverrideColorId != null) {
+                  const f = document.createElement('img'); f.className = 'pixel-marker'; f.alt = 'fill';
+                  try { f.style.zIndex = '1299'; } catch {}
+                  f.src = getMarkerSrcForColorId(selectedOverrideColorId);
+                  rec.fillEl = f;
+                  if (pixelSelectedList) pixelSelectedList.appendChild(f);
+                  positionPixelMarkerAtWorld(f, wx, wy);
+                }
+                if (pixelSelectedList) pixelSelectedList.appendChild(el);
+                positionPixelMarkerAtWorld(el, wx, wy);
+                readyGlobalSelected.set(key, rec);
+                if (pixelSelectedList) pixelSelectedList.hidden = false;
+                try { updateReadySelectionLabel(); updateStartEnabled(); } catch {}
+              }
+            }
+          } else {
+            const selItem = signItems[selectedIndex];
+            if (selItem && selItem.image && selItem.image.complete) {
+              const lx = Math.floor(worldX - (selItem.worldX || 0));
+              const ly = Math.floor(worldY - (selItem.worldY || 0));
+              if (lx >= 0 && ly >= 0 && lx < selItem.image.naturalWidth && ly < selItem.image.naturalHeight) {
+                if (isOpaquePixel(selItem, lx, ly) && (selectedOverrideColorId != null || !isSameColorAsBase(selItem, lx, ly))) {
+                  const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+                  const map = getSelectedMap(selItem);
+                  const already = map ? map.size : 0;
+                  if (limit > 0 && already >= limit) {
+                    showToast(t('messages.maxPixelsReached', { limit }), 'error', 2000);
+                    readyMouseDownPt = null; readyMouseMoved = false;
+                    return;
+                  }
+                  const didAdd = addPixelSelection(selItem, lx, ly, selectedOverrideColorId != null ? selectedOverrideColorId : null);
+                  if (didAdd) {
+                    try { updateReadySelectionLabel(); updateStartEnabled(); updatePixelMarkers(); render(); } catch {}
+                  }
+                }
+              }
+            }
+          }
+        } else if (readyMouseDownPt && !readyMouseMoved && e.button === 2) {
+          
+          const rect = canvas.getBoundingClientRect();
+          const px = e.clientX - rect.left;
+          const py = e.clientY - rect.top;
+          const worldX = (px - state.translateX) / state.scale;
+          const worldY = (py - state.translateY) / state.scale;
+          if (readyGlobalMode) {
+            const wx = Math.floor(worldX);
+            const wy = Math.floor(worldY);
+            if (img && wx >= 0 && wy >= 0 && wx < img.width && wy < img.height) {
+              const key = String(wx) + ',' + String(wy);
+              const rec = readyGlobalSelected.get(key);
+              if (rec) {
+                try { if (rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); } catch {}
+                try { if (rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl); } catch {}
+                readyGlobalSelected.delete(key);
+                try { updateReadySelectionLabel(); updateStartEnabled(); } catch {}
+              }
+            }
+          } else {
+            const selItem = signItems[selectedIndex];
+            if (selItem && selItem.image && selItem.image.complete) {
+              const lx = Math.floor(worldX - (selItem.worldX || 0));
+              const ly = Math.floor(worldY - (selItem.worldY || 0));
+              if (lx >= 0 && ly >= 0 && lx < selItem.image.naturalWidth && ly < selItem.image.naturalHeight) {
+                const removed = removePixelSelection(selItem, lx, ly);
+                if (removed) { try { updateReadySelectionLabel(); updateStartEnabled(); } catch {} }
+              }
+            }
+          }
+        }
+        readyMouseDownPt = null; readyMouseMoved = false;
+      }
+      state.dragging = false;
+      signDragging = false;
+      document.body.classList.remove('dragging');
+      setTimeout(() => { try { updatePixelMarkers(); } catch {} }, 50);
+    });
+
+    
+    document.addEventListener('mousedown', (e) => {
+      try {
+        const rp = document.getElementById('ready-popup');
+        if (rp && !rp.hidden) {
+          const isCanvasClick = (e.target === canvas) || (canvas && canvas.contains && canvas.contains(e.target));
+          const isPopupClick = (e.target === rp) || (rp && rp.contains && rp.contains(e.target));
+          const readyBtnEl = document.getElementById('btn-ready');
+          const isReadyBtnClick = (e.target === readyBtnEl) || (readyBtnEl && readyBtnEl.contains && readyBtnEl.contains(e.target));
+          const paletteEl = document.getElementById('color-palette');
+          const isPaletteClick = (e.target === paletteEl) || (paletteEl && paletteEl.contains && paletteEl.contains(e.target));
+          if (!isCanvasClick && !isPopupClick && !isReadyBtnClick && !isPaletteClick) {
+            
+            resetReadyNow();
+          }
+        }
+      } catch {}
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      state.zooming = true;
+      try { if (zoomingTimeout) { clearTimeout(zoomingTimeout); } } catch {}
+      if (!img) return;
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const imageX = (px - state.translateX) / state.scale;
+      const imageY = (py - state.translateY) / state.scale;
+      const zoom = Math.exp(-e.deltaY * 0.0015);
+      const newScale = Math.min(state.maxScale, Math.max(state.minScale, state.scale * zoom));
+      if (newScale === state.scale) return;
+      state.translateX = px - imageX * newScale;
+      state.translateY = py - imageY * newScale;
+      state.scale = newScale;
+      render();
+      updatePixelMarkers();
+      zoomingTimeout = setTimeout(() => { state.zooming = false; try { updatePixelMarkers(); } catch {} }, 50);
+    }, { passive: false });
+
+    window.addEventListener('resize', () => {
+      render();
+      updatePixelMarkers();
+    });
+
+    
+    function updatePixelPowerPosition() {}
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const area = areaInput.value.trim();
+      const no = noInput.value.trim();
+      if (!area || !no) return;
+      loadImage(area, no);
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ worldX: Number(area), worldY: Number(no) })
+        });
+      } catch {}
+    });
+
+    function updateCounter() {
+      const total = signItems.length;
+      const selected = selectedIndex >= 0 ? (selectedIndex + 1) : 0;
+      counter.textContent = String(selected) + ' / ' + String(total);
+      try {
+        const btn = document.getElementById('btn-ready');
+        if (btn) btn.disabled = !(
+          (selectedIndex >= 0 && selectedIndex < signItems.length) ||
+          (selectedOverrideColorId != null)
+        );
+      } catch {}
+    }
+
+    function updateThumbSelection() {
+      signItems.forEach((it, i) => {
+        if (it.el) it.el.classList.toggle('selected', i === selectedIndex);
+      });
+      try {
+        const btn = document.getElementById('btn-ready');
+        if (btn) btn.disabled = !(
+          (selectedIndex >= 0 && selectedIndex < signItems.length) ||
+          (selectedOverrideColorId != null)
+        );
+      } catch {}
+      
+      try {
+        if (!(selectedIndex >= 0 && selectedIndex < signItems.length)) {
+          const rp = document.getElementById('ready-popup');
+          if (rp) rp.hidden = true;
+          try { if (movementPopup) movementPopup.hidden = true; } catch {}
+        }
+      } catch {}
+      if (isReadyOpen()) { try { updateReadySelectionLabel(); } catch {} }
+      try { updateMovementButtonEnabled(); } catch {}
+      try {
+        const it = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+        if (movementBtn && movementPopup) {
+          const canOpen = !!(it && it.image && it.image.complete && !(it.locked || it.lockedByReady));
+          if (canOpen) {
+            if (window._mvOpenTmo) { try { clearTimeout(window._mvOpenTmo); } catch {} }
+            window._mvOpenTmo = setTimeout(() => { if (!readyPopup || readyPopup.hidden) movementPopup.hidden = false; }, 50);
+          }
+        }
+      } catch {}
+    }
+
+    function updateItemLockUi(item) {
+      if (!item || !item.el) return;
+      item.el.classList.toggle('locked', !!item.locked);
+      const btn = item.el.querySelector('.thumb-action.lock');
+      if (btn) btn.textContent = (item.locked || item.lockedByReady) ? '🔒' : '🔓';
+      try { updateMovementButtonEnabled(); } catch {}
+    }
+
+    function deleteItem(item) {
+      const idx = signItems.indexOf(item);
+      if (idx === -1) return;
+      if (readyLockedItem === item) {
+        try { readyLockedItem.lockedByReady = false; } catch {}
+        readyLockedItem = null;
+      }
+      if (item.el && item.el.parentNode) {
+        try { item.el.parentNode.removeChild(item.el); } catch {}
+      }
+      try { if (item.url) URL.revokeObjectURL(item.url); } catch {}
+      signItems.splice(idx, 1);
+      if (selectedIndex === idx) selectedIndex = Math.min(idx, signItems.length - 1);
+      else if (selectedIndex > idx) selectedIndex -= 1;
+      if (signItems.length === 0) selectedIndex = -1;
+      updateThumbSelection();
+      updateCounter();
+      render();
+      try { updateMovementButtonEnabled(); } catch {}
+    }
+
+    function zoomToSign(item) {
+      if (!item || !item.image) return;
+      const vw = canvas.clientWidth;
+      const vh = canvas.clientHeight;
+      const sw = item.image.naturalWidth || 1;
+      const sh = item.image.naturalHeight || 1;
+      const scaleToFit = Math.min(vw / sw, vh / sh);
+      const marginFactor = 0.85;
+      const newScale = Math.min(state.maxScale, Math.max(state.minScale, scaleToFit * marginFactor));
+      const centerX = (item.worldX || 0) + sw / 2;
+      const centerY = (item.worldY || 0) + sh / 2;
+      const centerPx = getContentCenterPx();
+      state.scale = newScale;
+      state.translateX = centerPx.x - centerX * newScale;
+      state.translateY = centerPx.y - centerY * newScale;
+      render();
+    }
+
+    function addThumbForItem(item, index) {
+      const div = document.createElement('div');
+      div.className = 'thumb-item';
+      const im = document.createElement('img');
+      im.src = item.url;
+      im.alt = item.name || (t('thumb.imageAlt', { n: (index + 1) }));
+      div.appendChild(im);
+
+      const actions = document.createElement('div');
+      actions.className = 'thumb-actions';
+      const btnLock = document.createElement('button');
+      btnLock.className = 'thumb-action lock';
+      btnLock.title = t('thumb.lock');
+      btnLock.textContent = item.locked ? '🔒' : '🔓';
+      btnLock.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        
+        item.locked = !item.locked;
+        updateItemLockUi(item);
+      });
+      const btnDel = document.createElement('button');
+      btnDel.className = 'thumb-action del';
+      btnDel.title = t('buttons.delete');
+      btnDel.textContent = '🗑️';
+      btnDel.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        deleteItem(item);
+      });
+      actions.appendChild(btnLock);
+      actions.appendChild(btnDel);
+      div.appendChild(actions);
+
+      div.addEventListener('click', () => {
+        selectSign(signItems.indexOf(item), true);
+      });
+      item.el = div;
+      if (item.lockedByReady == null) item.lockedByReady = false;
+      thumbList.appendChild(div);
+      updateItemLockUi(item);
+      updateThumbSelection();
+      updateCounter();
+    }
+
+    function selectSign(index, zoom = true) {
+      if (index < 0 || index >= signItems.length) return;
+      selectedIndex = index;
+      
+      try {
+        const rp = document.getElementById('ready-popup');
+        if (rp && !rp.hidden && readyLockedItem && readyLockedItem !== signItems[selectedIndex]) {
+          readyLockedItem.lockedByReady = false;
+          readyLockedItem = null;
+        }
+      } catch {}
+      const item = signItems[selectedIndex];
+      
+      try {
+        const rp = document.getElementById('ready-popup');
+        if (rp && !rp.hidden) {
+          readyHoverPixel = { x: null, y: null };
+          
+          ensureRenderedSelectedForItem(item);
+          updatePixelMarkers();
+        }
+      } catch {}
+      updateThumbSelection();
+      updateCounter();
+      try {
+        const btn = document.getElementById('btn-ready');
+        if (btn) btn.disabled = !(selectedIndex >= 0 && selectedIndex < signItems.length);
+      } catch {}
+      if (item.image && item.image.complete) {
+        if (zoom) zoomToSign(item);
+      } else {
+        pendingZoomToSelected = !!zoom;
+      }
+      render();
+    }
+
+    
+    function setAccountsActiveTab(name) {
+      if (!tabAccounts || !tabSettings) return;
+      const isAccounts = name === 'accounts';
+      tabAccounts.classList.toggle('active', isAccounts);
+      tabSettings.classList.toggle('active', !isAccounts);
+      if (accountsSection && settingsSection) {
+        accountsSection.hidden = !isAccounts;
+        settingsSection.hidden = isAccounts;
+        if (accountFormSection) accountFormSection.hidden = true;
+      }
+      try { if (!isAccounts) { loadSettings(); } } catch {}
+    }
+    if (tabAccounts) {
+      tabAccounts.addEventListener('click', () => setAccountsActiveTab('accounts'));
+    }
+    if (tabSettings) {
+      tabSettings.addEventListener('click', () => setAccountsActiveTab('settings'));
+    }
+    accountsBtn.addEventListener('click', async () => {
+      accountsModal.hidden = false;
+      setAccountsActiveTab('accounts');
+      try { await loadSettings(); } catch {}
+    });
+    function showAccountForm() {
+      if (!accountsSection || !accountFormSection) return;
+      accountsSection.hidden = true;
+      accountFormSection.hidden = false;
+      try {
+        accountNameInput.value = '';
+        accountTokenInput.value = '';
+        accountIdInput.value = '';
+        accountNameInput.focus();
+      } catch {}
+    }
+    function openEditAccount(row) {
+      if (!row) return;
+      if (!accountsSection || !accountFormSection) return;
+      accountsSection.hidden = true;
+      accountFormSection.hidden = false;
+      try {
+        accountNameInput.value = row.name || '';
+        accountTokenInput.value = row.token || '';
+        accountIdInput.value = String(row.id || '');
+        accountNameInput.focus();
+      } catch {}
+      
+      try { accountSaveBtn.textContent = t('buttons.save'); } catch {}
+    }
+    function showAccountList() {
+      if (!accountsSection || !accountFormSection) return;
+      accountFormSection.hidden = true;
+      accountsSection.hidden = false;
+      try { accountSaveBtn.textContent = t('buttons.add'); } catch {}
+    }
+    if (addAccountBtn) {
+      addAccountBtn.addEventListener('click', async () => {
+        try { await loadSettings(); } catch {}
+        const cf = (settingsCfInput.value || '').trim();
+        if (cf.length < 30) {
+          showToast(t('messages.addCfClearancePrompt'), 'error', 3000);
+          setAccountsActiveTab('settings');
+          return;
+        }
+        showAccountForm();
+      });
+    }
+    if (accountCancelBtn) {
+      accountCancelBtn.addEventListener('click', showAccountList);
+    }
+    function renderAccountsTable(rows) {
+      const sortedRows = Array.isArray(rows) ? rows.slice().sort((a, b) => {
+        const aActive = a && a.active !== false;
+        const bActive = b && b.active !== false;
+        if (aActive === bActive) return 0;
+        return aActive ? 1 : -1; // Inactive first
+      }) : [];
+      accountsData = sortedRows.slice();
+      accountsTbody.innerHTML = '';
+      sortedRows.forEach(row => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td'); tdName.textContent = row.name || '';
+        const tdToken = document.createElement('td');
+        const fullToken = row.token || '';
+        const shortToken = fullToken.length > 30 ? (fullToken.slice(0, 30) + '…') : fullToken;
+        tdToken.textContent = shortToken;
+        tdToken.title = fullToken;
+        const tdPixel = document.createElement('td');
+        const countRaw = (row.pixelCount == null ? null : Number(row.pixelCount));
+        const maxRaw = (row.pixelMax == null ? null : Number(row.pixelMax));
+        const count = (Number.isFinite(countRaw) ? Math.floor(countRaw) : null);
+        const max = (Number.isFinite(maxRaw) ? Math.floor(maxRaw) : null);
+        const isActive = row && row.active !== false;
+        tdPixel.textContent = (count == null || max == null) ? '-' : (String(count) + ' / ' + String(max));
+        const tdStatus = document.createElement('td');
+        tdStatus.textContent = isActive ? t('table.statusActive') : t('table.statusPassive');
+        const tdActions = document.createElement('td');
+        const actionsWrap = document.createElement('div');
+        actionsWrap.className = 'table-actions';
+        const rowTop = document.createElement('div');
+        rowTop.className = 'table-actions-row';
+        const rowBottom = document.createElement('div');
+        rowBottom.className = 'table-actions-row';
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'app-btn';
+        editBtn.textContent = t('buttons.edit');
+        editBtn.addEventListener('click', () => {
+          openEditAccount(row);
+        });
+        const checkBtn = document.createElement('button');
+        checkBtn.type = 'button';
+        checkBtn.className = 'app-btn';
+        checkBtn.textContent = t('buttons.checkPixels');
+        checkBtn.addEventListener('click', async () => {
+          try {
+            const res = await fetch('/api/accounts/' + row.id + '/refresh', { method: 'POST' });
+            if (!res.ok) return;
+            const updated = await res.json();
+            await loadAccounts();
+          } catch {}
+        });
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'app-btn';
+        delBtn.textContent = t('buttons.delete');
+        delBtn.addEventListener('click', async () => {
+          try {
+            await fetch('/api/accounts/' + row.id, { method: 'DELETE' });
+            await loadAccounts();
+          } catch {}
+        });
+        rowTop.appendChild(editBtn);
+        rowTop.appendChild(delBtn);
+        rowBottom.appendChild(checkBtn);
+        actionsWrap.appendChild(rowTop);
+        actionsWrap.appendChild(rowBottom);
+        tdActions.appendChild(actionsWrap);
+        tr.appendChild(tdName);
+        tr.appendChild(tdToken);
+        tr.appendChild(tdPixel);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdActions);
+        accountsTbody.appendChild(tr);
+      });
+      
+      try {
+        if (Array.isArray(sortedRows) && pixelPowerEl) {
+          let totalCount = 0;
+          let totalMax = 0;
+          for (let i = 0; i < sortedRows.length; i++) {
+            const r = sortedRows[i];
+            const isActive = r && r.active !== false && !!r.token;
+            if (!isActive) continue;
+            const cRaw = Number(r.pixelCount);
+            const mRaw = Number(r.pixelMax);
+            const c = Number.isFinite(cRaw) ? Math.floor(cRaw) : null;
+            const m = Number.isFinite(mRaw) ? Math.floor(mRaw) : null;
+            if (c != null) totalCount += c;
+            if (m != null) totalMax += m;
+          }
+          try { pixelPowerEl.setAttribute('data-count', String(totalCount)); pixelPowerEl.setAttribute('data-max', String(totalMax)); } catch {}
+          pixelPowerEl.textContent = t('pixel.powerLabel', { count: totalCount, max: totalMax });
+          try { checkFullnessNotify(); } catch {}
+        }
+      } catch {}
+    }
+    async function loadAccounts() {
+      try {
+        const res = await fetch('/api/accounts');
+        const data = await res.json();
+        if (Array.isArray(data)) renderAccountsTable(data);
+      } catch {}
+    }
+    async function refreshAccountById(accountId){
+      try {
+        await fetch('/api/accounts/' + encodeURIComponent(String(accountId)) + '/refresh', { method: 'POST' });
+      } catch {}
+      try { await loadAccounts(); } catch {}
+    }
+    const BULK_REFRESH_PERIOD_MS = 90 * 1000;
+    let lastBulkRefreshAt = 0;
+    let bulkRefreshInFlight = false;
+    async function refreshAllAccounts(){
+      const now = Date.now();
+      if (bulkRefreshInFlight) return;
+      if (now - lastBulkRefreshAt < BULK_REFRESH_PERIOD_MS - 500) return;
+      bulkRefreshInFlight = true;
+      try {
+        const res = await fetch('/api/accounts');
+        const rows = await res.json();
+        if (Array.isArray(rows)) {
+          for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            const id = r && r.id != null ? String(r.id) : '';
+            if (!id) continue;
+            try { await fetch('/api/accounts/' + encodeURIComponent(id) + '/refresh', { method: 'POST' }); } catch {}
+            
+            try { await new Promise(resolve => setTimeout(resolve, 1000)); } catch {}
+          }
+        }
+      } catch {}
+      try { await loadAccounts(); } catch {}
+      try { reloadCurrentBackground(); } catch {}
+      finally {
+        lastBulkRefreshAt = Date.now();
+        bulkRefreshInFlight = false;
+      }
+    }
+
+    if (checkAllBtn) {
+      checkAllBtn.addEventListener('click', async () => {
+        if (bulkRefreshInFlight) return;
+        try { checkAllBtn.classList.add('spinning'); } catch {}
+        try { checkAllBtn.disabled = true; } catch {}
+        try {
+          await refreshAllAccounts();
+        } finally {
+          try { checkAllBtn.classList.remove('spinning'); } catch {}
+          try { checkAllBtn.disabled = false; } catch {}
+        }
+      });
+    }
+    if (accountSaveBtn && accountsTbody) {
+      accountSaveBtn.addEventListener('click', async () => {
+        const id = (accountIdInput.value || '').trim();
+        const name = (accountNameInput.value || '').trim();
+        const token = (accountTokenInput.value || '').trim();
+        if (!name || !token) return;
+        try {
+          try { await loadAccounts(); } catch {}
+          try {
+            const dup = Array.isArray(accountsData) && accountsData.find(row => {
+              if (!row) return false;
+              const sameId = (id && String(row.id) === id);
+              return !sameId && String(row.token || '') === token;
+            });
+            if (dup) {
+              showToast(t('messages.tokenAlreadyExists'), 'error', 2500);
+              return;
+            }
+          } catch {}
+          if (id) {
+            const res = await fetch('/api/accounts/' + id, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, token })
+            });
+            if (!res.ok) return;
+            try { await fetch('/api/accounts/' + id + '/refresh', { method: 'POST' }); } catch {}
+          } else {
+            const res = await fetch('/api/accounts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, token })
+            });
+            if (!res.ok) return;
+            try {
+              const created = await res.json();
+              if (created && created.id != null) {
+                try { await fetch('/api/accounts/' + String(created.id) + '/refresh', { method: 'POST' }); } catch {}
+              }
+            } catch {}
+          }
+          await loadAccounts();
+          showAccountList();
+        } catch {}
+      });
+    }
+    
+    
+    let accountTokenInputDebounce = null;
+    if (accountTokenInput) {
+      accountTokenInput.addEventListener('input', () => {
+        const id = (accountIdInput && accountIdInput.value) ? accountIdInput.value.trim() : '';
+        if (!id) return; 
+        const name = (accountNameInput && accountNameInput.value) ? accountNameInput.value.trim() : '';
+        const token = (accountTokenInput && accountTokenInput.value) ? accountTokenInput.value.trim() : '';
+        try { if (accountTokenInputDebounce) clearTimeout(accountTokenInputDebounce); } catch {}
+        accountTokenInputDebounce = setTimeout(async () => {
+          try {
+            if (!token) return;
+            try { await loadAccounts(); } catch {}
+            try {
+              const dup = Array.isArray(accountsData) && accountsData.find(row => {
+                if (!row) return false;
+                const sameId = (id && String(row.id) === id);
+                return !sameId && String(row.token || '') === token;
+              });
+              if (dup) {
+                showToast(t('messages.tokenAlreadyExists'), 'error', 2500);
+                return;
+              }
+            } catch {}
+            await fetch('/api/accounts/' + id, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, token })
+            });
+            await fetch('/api/accounts/' + id + '/refresh', { method: 'POST' });
+            await loadAccounts();
+          } catch {}
+        }, 800);
+      });
+    }
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data && typeof data.cf_clearance === 'string') settingsCfInput.value = data.cf_clearance;
+        if (typeof data.worldX === 'number') areaInput.value = String(data.worldX);
+        if (typeof data.worldY === 'number') noInput.value = String(data.worldY);
+      } catch {}
+    }
+    if (settingsSaveBtn && settingsCfInput) {
+      settingsSaveBtn.addEventListener('click', async () => {
+        const v = (settingsCfInput.value || '').trim();
+        try {
+          // Prevent clearing cf_clearance while accounts exist
+          try { await loadAccounts(); } catch {}
+          const hasAnyAccount = Array.isArray(accountsData) && accountsData.length > 0;
+          if (hasAnyAccount && v.length === 0) {
+            showToast(t('messages.cfCannotBeClearedWithAccounts'), 'error', 2500);
+            return;
+          }
+          await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cf_clearance: v })
+          });
+        } catch {}
+        setAccountsActiveTab('accounts');
+      });
+    }
+    accountsClose.addEventListener('click', () => {
+      accountsModal.hidden = true;
+    });
+    accountsModal.addEventListener('click', (e) => {
+      if (e.target === accountsModal) accountsModal.hidden = true;
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') accountsModal.hidden = true;
+    });
+
+    
+    sign.addEventListener('load', () => {});
+
+    
+    uploadBtn.addEventListener('click', () => {
+      try { signFileInput.value = ''; } catch {}
+      signFileInput.click();
+    });
+    const imgPreviewModal = document.getElementById('img-preview-modal');
+    const imgPreviewCanvas = document.getElementById('img-preview-canvas');
+    const imgPreviewClose = document.getElementById('img-preview-close');
+    const imgPreviewCancel = document.getElementById('img-preview-cancel');
+    const imgPreviewApply = document.getElementById('img-preview-apply');
+    const imgScaleInput = document.getElementById('img-scale');
+    const imgKeepRatioInput = document.getElementById('img-keep-ratio');
+    const imgWidthInput = document.getElementById('img-width');
+    const imgHeightInput = document.getElementById('img-height');
+    const imgFillToggle = document.getElementById('img-fill-toggle');
+    const imgFillColorWrap = document.getElementById('img-fill-color');
+    let imgFillColorId = null; // null => none, number => palette id
+    let previewSourceImage = null;
+
+    function openImagePreview(image, filename){
+      previewSourceImage = image;
+      const w = image.naturalWidth|0;
+      const h = image.naturalHeight|0;
+      try { imgWidthInput.value = String(w); } catch {}
+      try { imgHeightInput.value = String(h); } catch {}
+      try { imgScaleInput.value = '100'; } catch {}
+      try { if (imgFillToggle) imgFillToggle.checked = false; } catch {}
+      imgFillColorId = null;
+      buildFillPaletteUi();
+      try { if (imgFillColorWrap) imgFillColorWrap.setAttribute('aria-disabled', 'true'); } catch {}
+      drawPreview();
+      imgPreviewModal.hidden = false;
+      try { document.body.classList.add('no-scroll'); } catch {}
+      imgPreviewApply._filename = filename || 'image.png';
+    }
+    function drawPreview(){
+      if (!imgPreviewCanvas || !previewSourceImage) return;
+      const ctxp = imgPreviewCanvas.getContext('2d');
+      ctxp.imageSmoothingEnabled = false;
+      ctxp.clearRect(0,0,imgPreviewCanvas.width,imgPreviewCanvas.height);
+      const targetW = Math.max(1, parseInt(imgWidthInput.value||'1', 10));
+      const targetH = Math.max(1, parseInt(imgHeightInput.value||'1', 10));
+      const off = document.createElement('canvas'); off.width = targetW; off.height = targetH;
+      const octx = off.getContext('2d', { willReadFrequently: true });
+      octx.imageSmoothingEnabled = false;
+      octx.drawImage(previewSourceImage, 0, 0, previewSourceImage.naturalWidth, previewSourceImage.naturalHeight, 0, 0, targetW, targetH);
+      try {
+        const id = octx.getImageData(0, 0, targetW, targetH);
+        const data = id.data;
+        const w2 = targetW + 2;
+        const errCurrR = new Float32Array(w2), errCurrG = new Float32Array(w2), errCurrB = new Float32Array(w2);
+        const errNextR = new Float32Array(w2), errNextG = new Float32Array(w2), errNextB = new Float32Array(w2);
+        for (let y = 0; y < targetH; y++) {
+          const leftToRight = (y % 2 === 0);
+          for (let i = 0; i < w2; i++) { errCurrR[i] += 0; errCurrG[i] += 0; errCurrB[i] += 0; }
+          if (leftToRight) {
+            for (let x = 0; x < targetW; x++) {
+              const idx = (y * targetW + x) * 4;
+              const a = data[idx + 3];
+              if (a === 0) {
+                // already filled by background above if enabled; skip quantization for speed
+                continue;
+              }
+              let r = data[idx] + errCurrR[x+1];
+              let g = data[idx+1] + errCurrG[x+1];
+              let b = data[idx+2] + errCurrB[x+1];
+              r = r < 0 ? 0 : (r > 255 ? 255 : r);
+              g = g < 0 ? 0 : (g > 255 ? 255 : g);
+              b = b < 0 ? 0 : (b > 255 ? 255 : b);
+              const nn = nearestPaletteRgb(r, g, b);
+              data[idx] = nn[0]; data[idx+1] = nn[1]; data[idx+2] = nn[2];
+              const er = r - nn[0];
+              const eg = g - nn[1];
+              const eb = b - nn[2];
+              errCurrR[x+2] += er * (7/16); errCurrG[x+2] += eg * (7/16); errCurrB[x+2] += eb * (7/16);
+              errNextR[x  ] += er * (3/16); errNextG[x  ] += eg * (3/16); errNextB[x  ] += eb * (3/16);
+              errNextR[x+1] += er * (5/16); errNextG[x+1] += eg * (5/16); errNextB[x+1] += eb * (5/16);
+              errNextR[x+2] += er * (1/16); errNextG[x+2] += eg * (1/16); errNextB[x+2] += eb * (1/16);
+            }
+          } else {
+            for (let x = targetW - 1; x >= 0; x--) {
+              const idx = (y * targetW + x) * 4;
+              const a = data[idx + 3];
+              if (a === 0) { continue; }
+              let r = data[idx] + errCurrR[x+1];
+              let g = data[idx+1] + errCurrG[x+1];
+              let b = data[idx+2] + errCurrB[x+1];
+              r = r < 0 ? 0 : (r > 255 ? 255 : r);
+              g = g < 0 ? 0 : (g > 255 ? 255 : g);
+              b = b < 0 ? 0 : (b > 255 ? 255 : b);
+              const nn = nearestPaletteRgb(r, g, b);
+              data[idx] = nn[0]; data[idx+1] = nn[1]; data[idx+2] = nn[2];
+              const er = r - nn[0];
+              const eg = g - nn[1];
+              const eb = b - nn[2];
+              errCurrR[x  ] += er * (7/16); errCurrG[x  ] += eg * (7/16); errCurrB[x  ] += eb * (7/16);
+              errNextR[x+2] += er * (3/16); errNextG[x+2] += eg * (3/16); errNextB[x+2] += eb * (3/16);
+              errNextR[x+1] += er * (5/16); errNextG[x+1] += eg * (5/16); errNextB[x+1] += eb * (5/16);
+              errNextR[x  ] += er * (1/16); errNextG[x  ] += eg * (1/16); errNextB[x  ] += eb * (1/16);
+            }
+          }
+          for (let i = 0; i < w2; i++) { errCurrR[i] = errNextR[i]; errCurrG[i] = errNextG[i]; errCurrB[i] = errNextB[i]; errNextR[i]=0; errNextG[i]=0; errNextB[i]=0; }
+        }
+        octx.putImageData(id, 0, 0);
+      } catch {}
+      // Compose optional background fill for display
+      let disp = off;
+      if (imgFillToggle && imgFillToggle.checked && imgFillColorId != null) {
+        const bg = document.createElement('canvas');
+        bg.width = targetW; bg.height = targetH;
+        const bctx = bg.getContext('2d', { willReadFrequently: true });
+        const rgb = getPaletteRgbById(imgFillColorId);
+        bctx.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+        bctx.fillRect(0,0,targetW,targetH);
+        bctx.drawImage(off, 0, 0);
+        disp = bg;
+      }
+      const scale = Math.min(imgPreviewCanvas.width/targetW, imgPreviewCanvas.height/targetH);
+      const drawW = Math.floor(targetW * scale);
+      const drawH = Math.floor(targetH * scale);
+      const dx = Math.floor((imgPreviewCanvas.width - drawW)/2);
+      const dy = Math.floor((imgPreviewCanvas.height - drawH)/2);
+      ctxp.drawImage(disp, 0, 0, targetW, targetH, dx, dy, drawW, drawH);
+    }
+    const MAX_DIM = 1000;
+    function clampDim(v){ return Math.max(1, Math.min(MAX_DIM, v|0)); }
+    function updateSizeFromScale(){
+      const pct = Math.max(1, Math.min(800, parseInt(imgScaleInput.value||'100',10)));
+      if (!previewSourceImage) return;
+      const w0 = previewSourceImage.naturalWidth|0, h0 = previewSourceImage.naturalHeight|0;
+      let nw = Math.round(w0 * pct / 100);
+      let nh = Math.round(h0 * pct / 100);
+      if (nw > MAX_DIM || nh > MAX_DIM) {
+        const s = Math.min(MAX_DIM / nw, MAX_DIM / nh);
+        nw = Math.max(1, Math.round(nw * s));
+        nh = Math.max(1, Math.round(nh * s));
+        try { showToast(t('preview.maxSizeExceeded'), 'error', 2000); } catch {}
+      }
+      imgWidthInput.value = String(nw);
+      imgHeightInput.value = String(nh);
+      drawPreview();
+    }
+    function updateHeightFromWidth(){
+      if (!previewSourceImage) { drawPreview(); return; }
+      let nw = clampDim(parseInt(imgWidthInput.value||'1',10));
+      imgWidthInput.value = String(nw);
+      if (!imgKeepRatioInput.checked) { drawPreview(); return; }
+      const w0 = previewSourceImage.naturalWidth|0, h0 = previewSourceImage.naturalHeight|0;
+      let nh = Math.round(nw * h0 / w0);
+      if (nh > MAX_DIM) { nh = MAX_DIM; nw = Math.round(nh * w0 / h0); imgWidthInput.value = String(nw); try { showToast(t('preview.maxSizeExceeded'), 'error', 2000); } catch {} }
+      imgHeightInput.value = String(nh);
+      const pct = Math.round(nw / w0 * 100);
+      imgScaleInput.value = String(pct);
+      drawPreview();
+    }
+    function updateWidthFromHeight(){
+      if (!previewSourceImage) { drawPreview(); return; }
+      let nh = clampDim(parseInt(imgHeightInput.value||'1',10));
+      imgHeightInput.value = String(nh);
+      if (!imgKeepRatioInput.checked) {
+        const w0 = previewSourceImage.naturalWidth|0, h0 = previewSourceImage.naturalHeight|0;
+        const pct = Math.round(nh / (h0||1) * 100);
+        imgScaleInput.value = String(pct);
+        drawPreview();
+        return;
+      }
+      const w0 = previewSourceImage.naturalWidth|0, h0 = previewSourceImage.naturalHeight|0;
+      let nw = Math.round(nh * w0 / h0);
+      if (nw > MAX_DIM) { nw = MAX_DIM; nh = Math.round(nw * h0 / w0); imgHeightInput.value = String(nh); try { showToast(t('preview.maxSizeExceeded'), 'error', 2000); } catch {} }
+      imgWidthInput.value = String(nw);
+      const pct = Math.round(nh / h0 * 100);
+      imgScaleInput.value = String(pct);
+      drawPreview();
+    }
+    if (imgScaleInput) imgScaleInput.addEventListener('input', updateSizeFromScale);
+    if (imgWidthInput) imgWidthInput.addEventListener('change', updateHeightFromWidth);
+    if (imgHeightInput) imgHeightInput.addEventListener('change', updateWidthFromHeight);
+    if (imgKeepRatioInput) imgKeepRatioInput.addEventListener('change', () => { drawPreview(); });
+    function buildFillPaletteUi(){
+      if (!imgFillColorWrap) return;
+      try { imgFillColorWrap.innerHTML = ''; } catch {}
+      // Transparent option (none)
+      const swNone = document.createElement('div');
+      swNone.className = 'palette-swatch transparent selected';
+      swNone.title = t('palette.transparentTitle');
+      swNone.setAttribute('role','button');
+      swNone.addEventListener('click', () => {
+        imgFillColorId = null;
+        updateFillPaletteSelectionUi();
+        drawPreview();
+      });
+      imgFillColorWrap.appendChild(swNone);
+      for (let i = 0; i < PALETTE.length; i++){
+        const p = PALETTE[i];
+        const el = document.createElement('div');
+        el.className = 'palette-swatch';
+        el.style.backgroundColor = 'rgb(' + p.rgb[0] + ',' + p.rgb[1] + ',' + p.rgb[2] + ')';
+        el.title = t('palette.colorTitle', { id: p.id });
+        el.setAttribute('data-id', String(p.id));
+        el.setAttribute('role','button');
+        el.addEventListener('click', () => {
+          imgFillColorId = p.id;
+          updateFillPaletteSelectionUi();
+          drawPreview();
+        });
+        imgFillColorWrap.appendChild(el);
+      }
+      updateFillPaletteSelectionUi();
+    }
+    function updateFillPaletteSelectionUi(){
+      if (!imgFillColorWrap) return;
+      const swatches = Array.from(imgFillColorWrap.querySelectorAll('.palette-swatch'));
+      swatches.forEach(sw => {
+        const idAttr = sw.getAttribute('data-id');
+        const id = idAttr == null ? null : Number(idAttr);
+        const isSelected = (idAttr == null && imgFillColorId == null) || (idAttr != null && id === imgFillColorId);
+        sw.classList.toggle('selected', !!isSelected);
+      });
+    }
+    if (imgFillToggle) imgFillToggle.addEventListener('change', () => {
+      try { imgFillColorWrap.setAttribute('aria-disabled', imgFillToggle.checked ? 'false' : 'true'); } catch {}
+      drawPreview();
+    });
+    function closeImgPreview(){ try { document.body.classList.remove('no-scroll'); } catch {} imgPreviewModal.hidden = true; }
+    if (imgPreviewClose) imgPreviewClose.addEventListener('click', closeImgPreview);
+    if (imgPreviewCancel) imgPreviewCancel.addEventListener('click', closeImgPreview);
+    if (imgPreviewApply) imgPreviewApply.addEventListener('click', async () => {
+      try {
+        if (!previewSourceImage) return;
+        let targetW = clampDim(parseInt(imgWidthInput.value||'1', 10));
+        let targetH = clampDim(parseInt(imgHeightInput.value||'1', 10));
+        if (targetW > MAX_DIM || targetH > MAX_DIM) { try { showToast(t('preview.maxSizeExceeded'), 'error', 2000); } catch {} }
+        const off = document.createElement('canvas');
+        off.width = targetW; off.height = targetH;
+        const octx = off.getContext('2d', { willReadFrequently: true });
+        octx.imageSmoothingEnabled = false;
+        if (imgFillToggle && imgFillToggle.checked && imgFillColorId != null) {
+          const rgb = getPaletteRgbById(imgFillColorId);
+          octx.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+          octx.fillRect(0, 0, targetW, targetH);
+        }
+        octx.drawImage(previewSourceImage, 0, 0, previewSourceImage.naturalWidth, previewSourceImage.naturalHeight, 0, 0, targetW, targetH);
+        const blob = await new Promise((resolve)=>{ off.toBlob((b)=>resolve(b), 'image/png'); });
+        const url0 = URL.createObjectURL(blob);
+        const tmpImg = new Image();
+        tmpImg.onload = async () => {
+          URL.revokeObjectURL(url0);
+          const qBlob = await quantizeImageToPalette(tmpImg);
+          const url = URL.createObjectURL(qBlob);
+          const imageEl = new Image();
+          imageEl.onload = () => {
+            const pixelCount = countNonTransparentPixels(imageEl);
+            const item = { url, name: imgPreviewApply._filename || 'image.png', image: imageEl, worldX: 0, worldY: 0, el: null, locked: false, pixelCount };
+            const centerPx = getContentCenterPx();
+            const centerWorldX = (centerPx.x - state.translateX) / state.scale;
+            const centerWorldY = (centerPx.y - state.translateY) / state.scale;
+            item.worldX = centerWorldX - imageEl.naturalWidth / 2;
+            item.worldY = centerWorldY - imageEl.naturalHeight / 2;
+            if (img) {
+              const maxX = Math.max(0, img.width - imageEl.naturalWidth);
+              const maxY = Math.max(0, img.height - imageEl.naturalHeight);
+              item.worldX = Math.min(Math.max(0, item.worldX), maxX);
+              item.worldY = Math.min(Math.max(0, item.worldY), maxY);
+            }
+            signItems.push(item);
+            selectedIndex = signItems.length - 1;
+            addThumbForItem(item, signItems.length - 1);
+            updateCounter();
+            pendingZoomToSelected = true;
+            render();
+            if (pendingZoomToSelected) { pendingZoomToSelected = false; zoomToSign(item); }
+            closeImgPreview();
+          };
+          imageEl.src = url;
+        };
+        tmpImg.src = url0;
+      } catch {}
+    });
+
+    signFileInput.addEventListener('change', () => {
+      const files = Array.from(signFileInput.files || []);
+      if (!files.length) return;
+      const file = files[0];
+      const tmpUrl = URL.createObjectURL(file);
+      const tmpImg = new Image();
+      tmpImg.onload = () => {
+        URL.revokeObjectURL(tmpUrl);
+        openImagePreview(tmpImg, file.name);
+      };
+      tmpImg.src = tmpUrl;
+    });
+
+    
+    
+
+    try {
+      const savedArea = localStorage.getItem('area code');
+      const savedNo = localStorage.getItem('no');
+      if (savedArea) areaInput.value = savedArea;
+      if (savedNo) noInput.value = savedNo;
+    } catch {}
+
+    
+    const readyBtn = document.getElementById('btn-ready');
+    const readyPopup = document.getElementById('ready-popup');
+    const autoSelectBtn = document.getElementById('btn-auto-select');
+    const autoSelectAccountsBtn = document.getElementById('btn-auto-select-accounts');
+    const startBtn = document.getElementById('start');
+    const readyPixelEl = document.getElementById('ready-pixel');
+    const readyAccountBtn = document.getElementById('btn-ready-account');
+    const readyAccountList = document.getElementById('ready-account-list');
+    const readyTokenInput = document.getElementById('ready-token-input');
+    const selectModeTrack = document.getElementById('select-mode-toggle');
+    const selectModeLabelLeft = document.getElementById('select-mode-label-left');
+    const selectModeLabelRight = document.getElementById('select-mode-label-right');
+    let selectMode = 'multi';
+
+    function updateSelectModeUi(){
+      try { if (selectModeTrack) selectModeTrack.classList.toggle('on', selectMode === 'frame'); } catch {}
+      try { if (selectModeTrack) selectModeTrack.setAttribute('aria-checked', selectMode === 'frame' ? 'true' : 'false'); } catch {}
+      try { if (selectModeLabelLeft) selectModeLabelLeft.classList.toggle('active', selectMode === 'multi'); } catch {}
+      try { if (selectModeLabelRight) selectModeLabelRight.classList.toggle('active', selectMode === 'frame'); } catch {}
+    }
+    function setSelectMode(mode){
+      selectMode = (mode === 'frame') ? 'frame' : 'multi';
+      updateSelectModeUi();
+    }
+    if (selectModeTrack) selectModeTrack.addEventListener('click', () => setSelectMode(selectMode === 'frame' ? 'multi' : 'frame'));
+    if (selectModeLabelLeft) selectModeLabelLeft.addEventListener('click', () => setSelectMode('multi'));
+    if (selectModeLabelRight) selectModeLabelRight.addEventListener('click', () => setSelectMode('frame'));
+
+    function getAccountById(id) {
+      const idStr = String(id);
+      for (let i = 0; i < accountsData.length; i++) {
+        const a = accountsData[i];
+        if (String(a.id) === idStr) return a;
+      }
+      return null;
+    }
+
+    function getReadySelectedCount() {
+      const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+      const map = getSelectedMap(sel);
+      return map ? map.size : 0;
+    }
+
+    function getReadySelectionLimit() {
+      if (!Array.isArray(readySelectedAccountIds) || readySelectedAccountIds.length === 0) return 0;
+      let total = 0;
+      for (let i = 0; i < readySelectedAccountIds.length; i++) {
+        const a = getAccountById(readySelectedAccountIds[i]);
+        if (!a || a.active === false || !a.token) continue;
+        const c = Number.isFinite(Number(a.pixelCount)) ? Number(a.pixelCount) : 0;
+        total += Math.max(0, Math.floor(c));
+      }
+      return total;
+    }
+
+    function updateReadySelectionLabel() {
+      if (!readyPixelEl) return;
+      const selected = readyGlobalMode ? readyGlobalSelected.size : getReadySelectedCount();
+      const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+      const count = selected;
+      try { readyPixelEl.setAttribute('data-count', String(count)); readyPixelEl.setAttribute('data-max', String(limit)); } catch {}
+      readyPixelEl.textContent = t('pixel.powerLabel', { count, max: limit });
+      try { updateAutoSelectButtonLabel(); } catch {}
+    }
+
+    function updateAutoSelectButtonLabel(){
+      if (!autoSelectBtn) return;
+      const selected = readyGlobalMode ? readyGlobalSelected.size : getReadySelectedCount();
+      const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+      const shouldDelete = (limit > 0 && selected >= limit);
+      autoSelectDeleteMode = !!shouldDelete;
+      try {
+        autoSelectBtn.textContent = shouldDelete ? t('ready.deleteAllSelected') : t('ready.autoSelect');
+      } catch {
+        autoSelectBtn.textContent = shouldDelete ? 'Delete all selected' : 'Auto select';
+      }
+    }
+
+    function updateReadyPixelForSelectedAccounts() {
+      updateReadySelectionLabel();
+      try { updateStartEnabled(); } catch {}
+    }
+
+    function renderReadyAccountList() {
+      if (!readyAccountList) return;
+      readyAccountList.innerHTML = '';
+      accountsData.forEach(row => {
+        const isActive = row && row.active !== false;
+        const hasToken = !!(row && row.token);
+        if (!isActive || !hasToken) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'app-btn';
+        const count = Number.isFinite(Number(row.pixelCount)) ? Number(row.pixelCount) : 0;
+        const max = Number.isFinite(Number(row.pixelMax)) ? Number(row.pixelMax) : 0;
+        const isSelected = readySelectedAccountIds.indexOf(row.id) !== -1;
+        btn.textContent = (isSelected ? '✓ ' : '') + (row.name || t('ready.accountLabelDefault')) + ' — ' + String(count) + ' / ' + String(max);
+        btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        btn.addEventListener('click', () => {
+          const idx = readySelectedAccountIds.indexOf(row.id);
+          if (idx === -1) {
+            if (readySelectedAccountIds.length >= MAX_READY_ACCOUNTS) {
+              try { showToast(t('messages.max12Accounts'), 'error', 2000); } catch {}
+              return;
+            }
+            readySelectedAccountIds.push(row.id);
+          } else {
+            readySelectedAccountIds.splice(idx, 1);
+          }
+          
+          try { renderReadyAccountList(); } catch {}
+          try { if (readyPixelEl) readyPixelEl.hidden = false; } catch {}
+          updateReadyPixelForSelectedAccounts();
+        });
+        readyAccountList.appendChild(btn);
+      });
+      try { updateAutoSelectButtonLabel(); } catch {}
+    }
+
+    function autoSelectTopAccountsByRatio(){
+      try {
+        const candidates = Array.isArray(accountsData) ? accountsData.filter(row => {
+          const isActive = row && row.active !== false && !!row.token;
+          const countRaw = Number(row && row.pixelCount);
+          const maxRaw = Number(row && row.pixelMax);
+          const valid = Number.isFinite(countRaw) && Number.isFinite(maxRaw) && maxRaw > 0;
+          return isActive && valid;
+        }).map(row => {
+          const count = Math.floor(Number(row.pixelCount));
+          const max = Math.floor(Number(row.pixelMax));
+          const ratio = (max > 0 ? (count / max) : -1);
+          return { id: row.id, ratio, count, max };
+        }) : [];
+        candidates.sort((a, b) => {
+          if (b.ratio !== a.ratio) return b.ratio - a.ratio;
+          if (b.count !== a.count) return b.count - a.count;
+          return b.max - a.max;
+        });
+        const top = candidates.slice(0, MAX_READY_ACCOUNTS).map(x => x.id);
+        readySelectedAccountIds = top;
+        try { renderReadyAccountList(); } catch {}
+        try { if (readyPixelEl) readyPixelEl.hidden = false; } catch {}
+        updateReadyPixelForSelectedAccounts();
+      } catch {}
+    }
+
+    if (readyAccountBtn) {
+      readyAccountBtn.addEventListener('click', () => {
+        try { renderReadyAccountList(); } catch {}
+        if (readyAccountList) readyAccountList.hidden = !readyAccountList.hidden;
+      });
+    }
+    if (autoSelectAccountsBtn) {
+      autoSelectAccountsBtn.addEventListener('click', async () => {
+        try { await loadAccounts(); } catch {}
+        autoSelectTopAccountsByRatio();
+      });
+    }
+
+    function resetReadyNow(){
+      try { if (readyPopup) readyPopup.hidden = true; } catch {}
+      try {
+        if (readyLockedItem) { readyLockedItem.lockedByReady = false; updateItemLockUi(readyLockedItem); readyLockedItem = null; }
+      } catch {}
+      readySelectedAccountIds = [];
+      readyShouldReset = false;
+      readyHoverPixel = { x: null, y: null };
+      
+      // Ensure no stale drag/ready state remains when resetting
+      try { readyMouseDownPt = null; } catch {}
+      try { readyMouseMoved = false; } catch {}
+      try { state.dragging = false; } catch {}
+      try { signDragging = false; } catch {}
+      try { document.body.classList.remove('dragging'); } catch {}
+      
+      try {
+        if (readyAccountBtn) readyAccountBtn.hidden = false;
+        if (readyPixelEl) readyPixelEl.hidden = true;
+        if (readyAccountList) readyAccountList.hidden = true;
+      } catch {}
+      try { updateAutoSelectButtonLabel(); } catch {}
+      try { updatePixelMarkers(); } catch {}
+      render();
+    }
+    if (readyBtn && readyPopup) {
+      readyBtn.addEventListener('click', async () => {
+        try {
+          await loadAccounts();
+          
+          // Clear any leftover drag/ready state before toggling the popup
+          try { readyMouseDownPt = null; } catch {}
+          try { readyMouseMoved = false; } catch {}
+          try { state.dragging = false; } catch {}
+          try { signDragging = false; } catch {}
+          try { document.body.classList.remove('dragging'); } catch {}
+          
+          try {
+            
+            if (readyShouldReset) {
+              readyShouldReset = false;
+              readySelectedAccountIds = [];
+              try { clearAllReadySelections(); } catch {}
+              try {
+                if (readyAccountBtn) readyAccountBtn.hidden = false;
+                if (readyPixelEl) readyPixelEl.hidden = true;
+                if (readyAccountList) readyAccountList.hidden = true;
+              } catch {}
+            }
+            if (readyPixelEl) readyPixelEl.hidden = false;
+            if (readyAccountList) readyAccountList.hidden = true;
+          } catch {}
+          // Always close movement popup when toggling Ready
+          try { if (movementPopup) movementPopup.hidden = true; } catch {}
+          readyPopup.hidden = !readyPopup.hidden;
+          
+          try {
+            if (!readyPopup.hidden) {
+              
+              readyGlobalMode = !((selectedIndex >= 0 && selectedIndex < signItems.length)) && (selectedOverrideColorId != null);
+              if (selectedIndex >= 0 && selectedIndex < signItems.length) {
+                const it = signItems[selectedIndex];
+                it.lockedByReady = true;
+                readyLockedItem = it;
+                try { updateItemLockUi(it); } catch {}
+                
+                readyHoverPixel = { x: null, y: null };
+                ensureRenderedSelectedForItem(it);
+                updatePixelMarkers();
+                updateReadySelectionLabel();
+              } else if (readyGlobalMode) {
+                
+                try { clearAllReadySelections(); } catch {}
+                readyHoverPixel = { x: null, y: null };
+                updatePixelMarkers();
+                updateReadySelectionLabel();
+              }
+            } else {
+              readyGlobalMode = false;
+              if (readyLockedItem) {
+                readyLockedItem.lockedByReady = false;
+                try { updateItemLockUi(readyLockedItem); } catch {}
+                readyLockedItem = null;
+              }
+              
+              try { pixelHoverEl.hidden = true; if (pixelSelectedList) pixelSelectedList.hidden = true; } catch {}
+              
+              try { if (readyAccountList) readyAccountList.hidden = true; } catch {}
+            }
+          } catch {}
+          try { updateAutoSelectButtonLabel(); } catch {}
+          render();
+        } catch {}
+      });
+    }
+    if (autoSelectBtn) {
+      autoSelectBtn.addEventListener('click', () => {
+        if (autoSelectDeleteMode) {
+          // Delete all selected pixels
+          if (readyGlobalMode) {
+            try {
+              readyGlobalSelected.forEach(rec => {
+                try { if (rec && rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el); } catch {}
+                try { if (rec && rec.fillEl && rec.fillEl.parentNode) rec.fillEl.parentNode.removeChild(rec.fillEl); } catch {}
+              });
+              readyGlobalSelected.clear();
+            } catch {}
+          } else {
+            const selItem = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+            if (selItem) {
+              try { clearSelectionsForItem(selItem); } catch {}
+            }
+          }
+          try { updateReadySelectionLabel(); updateStartEnabled(); updatePixelMarkers(); render(); } catch {}
+          return;
+        }
+
+      if (!Array.isArray(readySelectedAccountIds) || readySelectedAccountIds.length === 0) {
+          showToast(t('messages.selectAccountFirst'), 'error', 2000);
+          return;
+        }
+        
+      if (!(selectedIndex >= 0 && selectedIndex < signItems.length)) {
+        if (signItems.length > 0) selectSign(0, false); 
+      }
+        const selItem = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+        if (!selItem || !selItem.image || !selItem.image.complete) return;
+      
+        const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+        const map = getSelectedMap(selItem);
+        const already = map ? map.size : 0;
+        if (already >= limit) return;
+        const start = (selItem._lastManualSelected && Number.isFinite(selItem._lastManualSelected.x) && Number.isFinite(selItem._lastManualSelected.y))
+          ? { x: selItem._lastManualSelected.x, y: selItem._lastManualSelected.y }
+          : { x: 0, y: 0 };
+        const w = selItem.image.naturalWidth|0;
+        const h = selItem.image.naturalHeight|0;
+        const need = limit - already;
+        let addedCount = 0;
+        
+        if (selectMode === 'frame') {
+          addedCount = autoSelectFrameFirst(selItem, need);
+        } else {
+        let sx = start.x|0, sy = start.y|0;
+        const totalCells = w * h;
+        let traversed = 0;
+        while (addedCount < need && traversed < totalCells) {
+          if (isOpaquePixel(selItem, sx, sy) && (selectedOverrideColorId != null || !isSameColorAsBase(selItem, sx, sy))) {
+            const didAdd = addPixelSelection(selItem, sx, sy, selectedOverrideColorId != null ? selectedOverrideColorId : null);
+            if (didAdd) addedCount++;
+          }
+          sx += 1;
+          if (sx >= w) { sx = 0; sy += 1; }
+          if (sy >= h) { sy = 0; }
+          traversed++;
+          }
+        }
+        updateReadySelectionLabel();
+        updatePixelMarkers();
+        render();
+        try { updateStartEnabled(); } catch {}
+      });
+    }
+
+    function autoSelectFrameFirst(selItem, need){
+      if (!selItem || !selItem.image) return 0;
+      const w = selItem.image.naturalWidth|0;
+      const h = selItem.image.naturalHeight|0;
+      if (!(w && h)) return 0;
+      const size = w * h;
+      const idxOf = (x, y) => y * w + x;
+      const mask = new Uint8Array(size);
+      
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (isOpaquePixel(selItem, x, y) && (selectedOverrideColorId != null || !isSameColorAsBase(selItem, x, y))) {
+            mask[idxOf(x,y)] = 1;
+          }
+        }
+      }
+      let added = 0;
+      const isBoundary = (x, y) => {
+        const i = idxOf(x,y);
+        if (mask[i] === 0) return false;
+        if (x === 0 || mask[i-1] === 0) return true;
+        if (x === w-1 || mask[i+1] === 0) return true;
+        if (y === 0 || mask[i-w] === 0) return true;
+        if (y === h-1 || mask[i+w] === 0) return true;
+        return false;
+      };
+      while (added < need) {
+        const boundary = [];
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            if (isBoundary(x, y)) boundary.push({ x, y });
+          }
+        }
+        if (boundary.length === 0) break;
+        for (let k = 0; k < boundary.length && added < need; k++) {
+          const p = boundary[k];
+          if (addPixelSelection(selItem, p.x, p.y, selectedOverrideColorId != null ? selectedOverrideColorId : null)) added++;
+        }
+        for (let k = 0; k < boundary.length; k++) {
+          const p = boundary[k];
+          mask[idxOf(p.x, p.y)] = 0;
+        }
+      }
+      return added;
+    }
+    function getSelectedAccountsSortedByCapacityDesc() {
+      const rows = [];
+      for (let i = 0; i < readySelectedAccountIds.length; i++) {
+        const a = getAccountById(readySelectedAccountIds[i]);
+        if (a && typeof a.token === 'string' && a.token && a.active !== false) rows.push(a);
+      }
+      rows.sort((a, b) => (Number(b.pixelCount)||0) - (Number(a.pixelCount)||0));
+      return rows;
+    }
+
+    async function postBatch(area, no, colors, coords, t, jToken) {
+      try {
+        const res = await fetch('/api/pixel/' + encodeURIComponent(area) + '/' + encodeURIComponent(no), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ colors, coords, t, j: jToken })
+        });
+        const text = await res.text();
+        let payload = null;
+        try { payload = JSON.parse(text); } catch {}
+        
+        return { ok: res.status < 500 && !!(payload && Object.prototype.hasOwnProperty.call(payload, 'painted')), payload, text, status: res.status };
+      } catch (e) {
+        return { ok: false, error: e && e.message ? e.message : String(e) };
+      }
+    }
+
+    function updateStartEnabled() {
+      try {
+        if (!startBtn) return;
+        const hasToken = !!(readyTokenInput && readyTokenInput.value && readyTokenInput.value.trim().length > 0);
+        const hasAccounts = getSelectedAccountsSortedByCapacityDesc().length > 0;
+        const hasAnyPixel = readyGlobalMode ? (readyGlobalSelected.size > 0) : (getReadySelectedCount() > 0);
+        startBtn.disabled = !(hasToken && hasAccounts && hasAnyPixel);
+      } catch {}
+    }
+
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
+        const hasToken = !!(readyTokenInput && readyTokenInput.value && readyTokenInput.value.trim().length > 0);
+        const hasAccounts = getSelectedAccountsSortedByCapacityDesc().length > 0;
+        const hasAnyPixel = readyGlobalMode ? (readyGlobalSelected.size > 0) : (getReadySelectedCount() > 0);
+        if (!(hasToken && hasAccounts && hasAnyPixel)) {
+          showToast(t('messages.startRequirementsMissing'), 'error', 2500);
+          try { updateStartEnabled(); } catch {}
+          return;
+        }
+        const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+        if (!readyGlobalMode && !sel) { showToast(t('messages.noSelectedImage'), 'error', 2000); return; }
+        const data = buildSelectedExportForItem(sel);
+        const authToken = (readyTokenInput && readyTokenInput.value) ? String(readyTokenInput.value) : '';
+        const area = (areaInput && areaInput.value) ? String(areaInput.value).trim() : '';
+        const no = (noInput && noInput.value) ? String(noInput.value).trim() : '';
+        const total = data.colors.length|0;
+        const selectedAccounts = getSelectedAccountsSortedByCapacityDesc();
+        (async () => {
+          let offset = 0;
+          const usedIds = [];
+          let hadRequestError = false;
+          for (let i = 0; i < selectedAccounts.length && offset < total; i++) {
+            const acc = selectedAccounts[i];
+            const cap = Math.max(0, Math.floor(Number(acc.pixelCount) || 0));
+            if (cap <= 0) continue;
+            const take = Math.min(cap, total - offset);
+            if (take <= 0) continue;
+            const colorsSlice = data.colors.slice(offset, offset + take);
+            const coordsSlice = data.coords.slice(offset * 2, (offset + take) * 2);
+            const r = await postBatch(area, no, colorsSlice, coordsSlice, authToken, String(acc.token || ''));
+            if (r && r.status === 429) {
+              hadRequestError = true;
+              try { showToast(t('messages.cfClearanceChange'), 'error', 3500); } catch { showToast('Please change cf_clearance.', 'error', 3500); }
+              break;
+            }
+            if (!r.ok) {
+              if (r.status >= 500) {
+                try { await loadAccounts(); } catch {}
+                continue;
+              } else {
+                hadRequestError = true;
+                showToast(r.payload ? JSON.stringify(r.payload) : (r.text || r.error || t('messages.errorGeneric')), 'error', 3000);
+                break;
+              }
+            }
+            usedIds.push(acc.id);
+            offset += take;
+            try { await refreshAccountById(acc.id); } catch {}
+          }
+          if (offset > 0) {
+            showToast(t('messages.painted'), 'success', 1800);
+            reloadCurrentBackground();
+            try { clearAllReadySelections(); } catch {}
+            try { resetReadyNow(); } catch {}
+            try { readyGlobalMode = false; } catch {}
+            try { updateStartEnabled(); } catch {}
+          }
+          if (offset < total && !hadRequestError) {
+            showToast(t('messages.insufficientPixelPower', { n: (total - offset) }), 'error', 3000);
+          }
+          
+          try { await loadAccounts(); } catch {}
+          
+          try { updateReadySelectionLabel(); } catch {}
+          render();
+          render();
+        })();
+      });
+    }
+
+    // Space-to-paint: press/hold Space to add selection at hover pixel (like left-click)
+    let spacePaintHeld = false;
+    let spacePaintLastKey = null;
+    let spacePaintLimitWarned = false;
+    let spacePaintAccountWarned = false;
+
+    function showMaxReachedToastOnceForSpace(limit){
+      if (spacePaintHeld) {
+        if (spacePaintLimitWarned) return;
+        spacePaintLimitWarned = true;
+      }
+      showToast(t('messages.maxPixelsReached', { limit }), 'error', 2000);
+    }
+
+    function maybeAddSelectionAtHover(){
+      if (!isReadyOpen()) return false;
+      if (!readyHoverPixel || readyHoverPixel.x == null || readyHoverPixel.y == null) return false;
+      if (!img) return false;
+      if (readyGlobalMode) {
+        const hasAccounts = Array.isArray(readySelectedAccountIds) && readySelectedAccountIds.length > 0;
+        if (!hasAccounts) {
+          if (spacePaintHeld) {
+            if (!spacePaintAccountWarned) { showToast(t('messages.selectAccountFirst'), 'error', 2000); spacePaintAccountWarned = true; }
+          } else {
+            showToast(t('messages.selectAccountFirst'), 'error', 2000);
+          }
+          return false;
+        }
+        const wx = readyHoverPixel.x|0;
+        const wy = readyHoverPixel.y|0;
+        if (wx < 0 || wy < 0 || wx >= img.width || wy >= img.height) return false;
+        const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+        if (limit > 0 && readyGlobalSelected.size >= limit) { showMaxReachedToastOnceForSpace(limit); return false; }
+        const key = String(wx) + ',' + String(wy);
+        if (readyGlobalSelected.has(key)) return false;
+        const el = document.createElement('img');
+        el.className = 'pixel-marker'; el.alt = 'selected'; el.src = SELECTED_ICON_SRC;
+        const rec = { wx, wy, el, fillEl: null, colorId: selectedOverrideColorId };
+        if (selectedOverrideColorId != null) {
+          const f = document.createElement('img'); f.className = 'pixel-marker'; f.alt = 'fill';
+          try { f.style.zIndex = '1299'; } catch {}
+          f.src = getMarkerSrcForColorId(selectedOverrideColorId);
+          rec.fillEl = f;
+          if (pixelSelectedList) pixelSelectedList.appendChild(f);
+          positionPixelMarkerAtWorld(f, wx, wy);
+        }
+        if (pixelSelectedList) pixelSelectedList.appendChild(el);
+        positionPixelMarkerAtWorld(el, wx, wy);
+        readyGlobalSelected.set(key, rec);
+        if (pixelSelectedList) pixelSelectedList.hidden = false;
+        try { updateReadySelectionLabel(); updateStartEnabled(); } catch {}
+        return true;
+      } else {
+        const selItem = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+        if (!selItem || !selItem.image || !selItem.image.complete) return false;
+        const lx = readyHoverPixel.x|0;
+        const ly = readyHoverPixel.y|0;
+        if (lx < 0 || ly < 0 || lx >= selItem.image.naturalWidth || ly >= selItem.image.naturalHeight) return false;
+        if (!(isOpaquePixel(selItem, lx, ly) && (selectedOverrideColorId != null || !isSameColorAsBase(selItem, lx, ly)))) return false;
+        const limit = Math.max(0, Number(getReadySelectionLimit()) || 0);
+        const map = getSelectedMap(selItem);
+        const already = map ? map.size : 0;
+        if (limit > 0 && already >= limit) { showMaxReachedToastOnceForSpace(limit); return false; }
+        const didAdd = addPixelSelection(selItem, lx, ly, selectedOverrideColorId != null ? selectedOverrideColorId : null);
+        if (didAdd) {
+          try { updateReadySelectionLabel(); updateStartEnabled(); updatePixelMarkers(); render(); } catch {}
+          return true;
+        }
+        return false;
+      }
+    }
+    function isTypingTarget(target){
+      const tag = (target && target.tagName) ? target.tagName.toLowerCase() : '';
+      return tag === 'input' || tag === 'textarea' || tag === 'select' || (target && target.isContentEditable);
+    }
+    function currentHoverKey(){
+      if (!readyHoverPixel || readyHoverPixel.x == null || readyHoverPixel.y == null) return null;
+      return (readyGlobalMode ? 'g:' : 'l:') + String(readyHoverPixel.x) + ',' + String(readyHoverPixel.y);
+    }
+    window.addEventListener('keydown', (e) => {
+      const key = e.code || e.key || '';
+      if (key !== 'Space' && key !== ' ') return;
+      if (!isReadyOpen() || isTypingTarget(e.target)) return;
+      if (spacePaintHeld) { try { e.preventDefault(); e.stopPropagation(); } catch {} return; }
+      spacePaintHeld = true;
+      spacePaintLimitWarned = false;
+      spacePaintAccountWarned = false;
+      try { e.preventDefault(); e.stopPropagation(); } catch {}
+      maybeAddSelectionAtHover();
+      spacePaintLastKey = currentHoverKey();
+    });
+    window.addEventListener('mousemove', () => {
+      if (!spacePaintHeld || !isReadyOpen()) return;
+      if (spacePaintLastKey === currentHoverKey()) return;
+      if (maybeAddSelectionAtHover()) {
+        spacePaintLastKey = currentHoverKey();
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      const key = e.code || e.key || '';
+      if (key === 'Space' || key === ' ') { spacePaintHeld = false; spacePaintLastKey = null; spacePaintLimitWarned = false; spacePaintAccountWarned = false; }
+    });
+
+    (async () => {
+      try {
+        await loadSettings();
+        if (areaInput.value && noInput.value) {
+          loadImage(areaInput.value, noInput.value);
+        }
+      } catch {}
+      updateCounter();
+      loadAccounts();
+    })();
+    updatePixelPowerPosition();
+    
+    try {
+      setInterval(() => { refreshAllAccounts(); }, 20 * 1000);
+    } catch {}
+    
+    
+    try { setupColorPalette(); } catch {}
+
+    function getItemPixelPaletteId(item, sx, sy){
+      const c = getItemPixelColor(item, sx, sy);
+      if (!c || c.a === 0) return null;
+      return rgbToPaletteId(c.r, c.g, c.b);
+    }
+
+    function buildSelectedExportForItem(item){
+      const map = getSelectedMap(item);
+      const coords = [];
+      const colors = [];
+      if (readyGlobalMode) {
+        readyGlobalSelected.forEach((rec) => {
+          coords.push(rec.wx, rec.wy);
+          colors.push(rec.colorId == null ? null : rec.colorId);
+        });
+      } else if (map) {
+        map.forEach((rec) => {
+          const wx = Math.round((item.worldX || 0) + rec.x);
+          const wy = Math.round((item.worldY || 0) + rec.y);
+          coords.push(wx, wy);
+          const pid = (rec && rec.colorId != null) ? rec.colorId : getItemPixelPaletteId(item, rec.x, rec.y);
+          colors.push(pid == null ? null : pid);
+        });
+      }
+      return { colors, coords };
+    }
+
+    function logSelectedPixelsCurrentItem(){
+      try {
+        const sel = (selectedIndex >= 0 && selectedIndex < signItems.length) ? signItems[selectedIndex] : null;
+        if (!sel) return;
+        const data = buildSelectedExportForItem(sel);
+        const t = (readyTokenInput && readyTokenInput.value) ? readyTokenInput.value : '';
+        console.log({ colors: data.colors, coords: data.coords, t });
+      } catch {}
+    }
+
+    if (readyTokenInput) {
+      readyTokenInput.addEventListener('input', () => {
+        updateStartEnabled();
+      });
+    }
+  </script>
+</body>
+</html> 

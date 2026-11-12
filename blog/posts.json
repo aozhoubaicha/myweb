@@ -1,0 +1,65 @@
+{
+    "updated": "2026-11-04",
+    "posts": [
+        {
+            "slug": "blog_5",
+            "title": "暑假以来的若干总结",
+            "date": "2025-09-07",
+            "tags": [
+                "随笔"
+            ],
+            "summary": "撰写一些小内容...",
+            "cover": "img/blog/cover-azb.webp",
+            "file": "blog/blog_5.html",
+            "source": "blog/source/blog_5.md"
+        },
+        {
+            "slug": "blog_4",
+            "title": "不尽如人意的周四",
+            "date": "2025-05-17",
+            "tags": [
+                "随笔"
+            ],
+            "summary": "好想成为人类啊...或者是成为大人物啊...去想去的地方发光发热...",
+            "cover": "img/blog/cover-azb.webp",
+            "file": "blog/blog_4.html",
+            "source": "blog/source/blog_4.md"
+        },
+        {
+            "slug": "blog_3",
+            "title": "日常的第三篇",
+            "date": "2025-03-01",
+            "tags": [
+                "随笔"
+            ],
+            "summary": "步入日常之后的日记...",
+            "cover": "img/blog/cover-blog_3.webp",
+            "file": "blog/blog_3.html",
+            "source": "blog/source/blog_3.md"
+        },
+        {
+            "slug": "blog_2",
+            "title": "芜杂的第二篇",
+            "date": "2025-01-05",
+            "tags": [
+                "随笔"
+            ],
+            "summary": "期末考试前完蛋宣言...",
+            "cover": "img/blog/cover-blog_2.webp",
+            "file": "blog/blog_2.html",
+            "source": "blog/source/blog_2.md"
+        },
+        {
+            "slug": "blog_1",
+            "title": "故事开始的第一篇",
+            "date": "2025-01-02",
+            "tags": [
+                "随笔"
+            ],
+            "summary": "关于开始，以及其他...",
+            "cover": "img/blog/cover-blog_1.webp",
+            "file": "blog/blog_1.html",
+            "source": "blog/source/blog_1.md"
+        }
+    ]
+}

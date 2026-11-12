@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>乱动之大图书馆</title>
+    <title>友情链接 · 大图书馆存档</title>
+    <meta name="description" content="澳洲白茶收藏的友站，以及交换友情链接的方式。">
+    <meta name="theme-color" content="#d9e4f5">
+    <link rel="canonical" href="https://anzhoubai.vip/friend.html">
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/png" href="./img/ico.png">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/friend.css">
 </head>
 <body>
     <!-- 主内容区 -->
@@ -14,49 +20,68 @@
         <!-- 左侧栏 -->
         <aside class="sidebar-container">
             <div class="sidebar glass-effect">
-                <div class="profile" role="img" aria-label="澳洲白茶个人资料">
-                    <img src="./img/toux.png" alt="头像" class="avatar">
+                <div class="profile">
+                    <img src="./img/toux.webp" alt="澳洲白茶的头像" class="avatar" width="120" height="120" decoding="async">
                     <h3>澳洲白茶</h3>
+                    <p class="role">SINCE 2025</p>
                 </div>
                 <nav class="sidebar-nav" aria-label="侧边导航">
                     <ul>
                         <li><a href="./index.html">主页</a></li>
                         <li><a href="./blog.html">博客</a></li>
                         <li><a href="./rsc.html">资源</a></li>
-                        <li><a href="./friend.html">友情链接</a></li>
+                        <li><a href="./friend.html" aria-current="page">友情链接</a></li>
                         <li><a href="./about.html">关于</a></li>
                     </ul>
                 </nav>
                 <div class="social-icons" aria-label="社交媒体链接">
-                    <a href="https://github.com/aozhoubaicha" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="https://www.zhihu.com" target="_blank" aria-label="知乎"><i class="fab fa-zhihu"></i></a>
-                    <a href="https://space.bilibili.com" target="_blank" aria-label="哔哩哔哩"><i class="fab fa-bilibili"></i></a>
+                    <a href="https://github.com/aozhoubaicha" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+                    <a href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer" aria-label="知乎"><i class="fab fa-zhihu" aria-hidden="true"></i></a>
+                    <a href="https://space.bilibili.com" target="_blank" rel="noopener noreferrer" aria-label="哔哩哔哩"><i class="fab fa-bilibili" aria-hidden="true"></i></a>
                 </div>
             </div>
             <footer class="sidebar2">
-                # 2025 <a href="./about.html" style="color: #000; text-decoration: none;">澳洲白茶</a>
+                © 2025 <a href="./about.html">澳洲白茶</a>
             </footer>
         </aside>
 
+        <!-- 右侧主内容 -->
+        <section class="main-page friends-page">
+            <header class="friends-head">
+                <h1>友情链接</h1>
+                <p class="sub">NEIGHBORS OF THE LIBRARY</p>
+            </header>
 
-    <!-- 右侧主内容 -->
-    <div class="main-page">
-        <div class="sidebar_f">
-            <div class="profile_f">
-            <img src="./img/muwinds.jpg" alt="" class="avatar">
-            <h3><a href="https://blog.muwinds.com/" style="color: black;text-decoration: none;">沐风</a></h3>
-            </div>
+            <p class="friends-intro">一些我常去看的站点。想交换友链的话，信息在页面末尾。</p>
 
-        </div>
-        <div class="sidebar_f">
-            <div class="profile_f">
-            <img src="./img/ico.png" alt="" class="avatar">
-            <h3><a href="#" style="color: black;text-decoration: none;">test</a></h3>
-            </div>
+            <ul class="friend-grid">
+                <li class="friend-card">
+                    <a href="https://blog.muwinds.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="./img/muwinds.jpg" alt="沐风的头像" width="80" height="80" loading="lazy" decoding="async">
+                        <span class="friend-name">沐风</span>
+                        <span class="friend-desc">blog.muwinds.com</span>
+                    </a>
+                </li>
+                <li class="friend-card is-empty">
+                    <div class="friend-empty">
+                        <span class="friend-name">虚位以待</span>
+                        <span class="friend-desc">等待一位新邻居</span>
+                    </div>
+                </li>
+            </ul>
 
-        </div>
-    </div>
-</main>
+            <section class="friend-note">
+                <h2>交换友链</h2>
+                <p>欢迎同好交换链接：站点内容正常、能长期访问即可，通过下面的信息找到我。</p>
+                <dl class="friend-meta">
+                    <div><dt>名称</dt><dd>澳洲白茶</dd></div>
+                    <div><dt>链接</dt><dd><a href="https://anzhoubai.vip">https://anzhoubai.vip</a></dd></div>
+                    <div><dt>头像</dt><dd><a href="https://anzhoubai.vip/img/ico.png">https://anzhoubai.vip/img/ico.png</a></dd></div>
+                </dl>
+            </section>
+        </section>
+    </main>
+
     <!-- 引入JavaScript -->
     <script src="scripts/main.js"></script>
 </body>

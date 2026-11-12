@@ -28,3 +28,18 @@
     0%, 100% { transform: translateY(-10px); } /* 上下浮动起始和结束 */
     50% { transform: translateY(-15px); } /* 中间位置 */
 }
+
+/* 用户偏好减少动态效果：关闭渐隐/浮动动画，内容直接可见 */
+@media (prefers-reduced-motion: reduce) {
+    .fadetext,
+    .fade-in {
+        opacity: 1;
+        animation: none;
+        transition: none;
+    }
+
+    .floatbox:hover {
+        transform: none;
+        animation: none;
+    }
+}
