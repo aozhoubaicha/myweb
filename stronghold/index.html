@@ -89,6 +89,24 @@
       </section>
     </div>
 
+    <div class="grid-two" id="rateRow">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>近期胜率</h2>
+          <div class="seg mini" id="winSeg">
+            <button data-w="10" class="on">近 10 场</button>
+            <button data-w="20">近 20 场</button>
+            <button data-w="0">累计</button>
+          </div>
+        </div>
+        <div id="winChart" class="chart"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>策略胜率</h2><span class="muted small" id="bandHint"></span></div>
+        <div id="bandRates" class="bars"></div>
+      </section>
+    </div>
+
     <section class="panel" id="listPanel">
       <div class="panel-head wrap">
         <h2>对局记录 <span id="count" class="count"></span></h2>

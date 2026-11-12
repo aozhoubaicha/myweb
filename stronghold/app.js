@@ -19,6 +19,7 @@ const state = {
   data: null,
   filter: { result: 'all', mode: 'all', diff: 'all' },
   idx: { chars: new Map(), bonds: new Map(), strategies: new Map(), items: new Map() },
+  winWindow: 10,
   busy: false,
 };
 
@@ -209,7 +210,9 @@ function renderAll() {
 
   renderStats(recs);
   drawChart(recs, $('#chart'));
+  drawWinChart(recs, $('#winChart'));
   renderOperators(recs);
+  renderBandRates(recs);
   renderList();
 
   const when = new Date(state.data.fetchedAt);
@@ -279,6 +282,87 @@ function drawChart(recs, host) {
     <text x="${padL}" y="${H - 8}" fill="#6f807c" font-size="10">${fmtTime(asc[0].gameStartTs)}</text>
     <text x="${W - padR}" y="${H - 8}" fill="#6f807c" font-size="10" text-anchor="end">${fmtTime(asc[asc.length - 1].gameStartTs)}</text>
   </svg>`;
+}
+
+function drawWinChart(recs, host) {
+  if (!host || !recs.length) { if (host) host.innerHTML = ''; return; }
+  const win = Number(state.winWindow) || 0;
+  const W = host.clientWidth || 700;
+  const H = host.clientHeight || 200;
+  const asc = [...recs].sort((a, b) => Number(a.gameStartTs) - Number(b.gameStartTs));
+
+  const pts = asc.map((r, i) => {
+    const from = win > 0 ? Math.max(0, i - win + 1) : 0;
+    const slice = asc.slice(from, i + 1);
+    const w = slice.filter((x) => Number(x.completeState) === 1).length;
+    return { i, rate: (w / slice.length) * 100, size: slice.length, win: Number(r.completeState) === 1, rec: r };
+  });
+
+  const padL = 34, padR = 34, padT = 10, padB = 22;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  const x = (i) => padL + (pts.length === 1 ? iw / 2 : (i / (pts.length - 1)) * iw);
+  const y = (v) => padT + ih - (v / 100) * ih;
+
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.rate).toFixed(1)}`).join(' ');
+  const area = `${line} L${x(pts.length - 1).toFixed(1)},${(padT + ih).toFixed(1)} L${x(0).toFixed(1)},${(padT + ih).toFixed(1)} Z`;
+
+  let grid = '';
+  for (const v of [0, 25, 50, 75, 100]) {
+    const yy = y(v);
+    grid += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="rgba(255,255,255,.05)"/>
+      <text x="${padL - 6}" y="${(yy + 3.5).toFixed(1)}" fill="#6f807c" font-size="10" text-anchor="end">${v}%</text>`;
+  }
+
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.rate).toFixed(1)}" r="${p.win ? 3 : 2.4}"
+      fill="${p.win ? '#2ee6b6' : '#5a6b68'}">
+      <title>${fmtFull(p.rec.gameStartTs)} · 近${p.size}场胜率 ${p.rate.toFixed(0)}% · 本局${p.win ? '成功' : '中断'}</title></circle>`).join('');
+
+  const last = pts[pts.length - 1];
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%">
+    <defs><linearGradient id="gw" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2ee6b6" stop-opacity=".22"/><stop offset="100%" stop-color="#2ee6b6" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${grid}
+    <line x1="${padL}" y1="${y(50).toFixed(1)}" x2="${W - padR}" y2="${y(50).toFixed(1)}" stroke="rgba(240,198,107,.28)" stroke-dasharray="4 4"/>
+    <path d="${area}" fill="url(#gw)"/>
+    <path d="${line}" fill="none" stroke="#2ee6b6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    <text x="${W - 4}" y="${(y(last.rate) - 6).toFixed(1)}" fill="#2ee6b6" font-size="11" text-anchor="end" font-weight="600">${last.rate.toFixed(0)}%</text>
+    <text x="${padL}" y="${H - 6}" fill="#6f807c" font-size="10">${fmtTime(asc[0].gameStartTs)}</text>
+    <text x="${W - padR}" y="${H - 6}" fill="#6f807c" font-size="10" text-anchor="end">${fmtTime(asc[asc.length - 1].gameStartTs)}</text>
+  </svg>`;
+}
+
+function strategyStats(recs) {
+  const map = new Map();
+  for (const r of recs) {
+    const id = r.bandId || 'unknown';
+    const cur = map.get(id) || { id, games: 0, wins: 0 };
+    cur.games++;
+    if (Number(r.completeState) === 1) cur.wins++;
+    map.set(id, cur);
+  }
+  return [...map.values()].sort((a, b) => b.games - a.games || b.wins - a.wins);
+}
+
+function renderBandRates(recs) {
+  const all = strategyStats(recs);
+  const pool = all.filter((s) => s.games >= 2);
+  const list = (pool.length ? pool : all).slice(0, 8);
+  const host = $('#bandRates');
+  if (!host) return;
+  const hint = $('#bandHint');
+  if (hint) hint.textContent = pool.length ? `前 ${list.length} / ${all.length} 种` : `${all.length} 种策略`;
+  host.innerHTML = list.map((s) => {
+    const st = state.idx.strategies.get(s.id) || {};
+    const rate = Math.round((s.wins / s.games) * 100);
+    const tone = rate >= 60 ? 'good' : rate >= 40 ? 'mid' : 'bad';
+    return `<div class="bar-row" title="${esc(st.name || s.id)} · ${s.wins} 胜 / ${s.games} 场">
+      <div class="bar-name">${st.iconUrl ? `<img src="${esc(st.iconUrl)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}<span>${esc(st.name || s.id)}</span></div>
+      <div class="bar-track"><i class="${tone}" style="width:${Math.max(rate, 3)}%"></i></div>
+      <div class="bar-val"><b>${rate}%</b><small>${s.wins}/${s.games}</small></div>
+    </div>`;
+  }).join('') || '<div class="muted small">暂无数据</div>';
 }
 
 function renderOperators(recs) {
@@ -486,6 +570,8 @@ $('#btn-account').addEventListener('click', () => {
   state.data = null;
   $('#stats').innerHTML = '';
   $('#chart').innerHTML = '';
+  $('#winChart').innerHTML = '';
+  $('#bandRates').innerHTML = '';
   $('#operators').innerHTML = '';
   $('#list').innerHTML = '';
   $('#btn-refresh').disabled = true;
@@ -524,7 +610,7 @@ $('#btn-paste').addEventListener('click', () => {
   refresh(true);
 });
 
-$$('.seg').forEach((seg) => {
+$$('.seg[data-filter]').forEach((seg) => {
   seg.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
@@ -533,13 +619,25 @@ $$('.seg').forEach((seg) => {
     renderList();
   });
 });
+
+$('#winSeg')?.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  $$('button', $('#winSeg')).forEach((x) => x.classList.toggle('on', x === b));
+  state.winWindow = Number(b.dataset.w) || 0;
+  if (state.data) drawWinChart(state.data.records, $('#winChart'));
+});
 $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeDetail(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
 
 let rz;
 addEventListener('resize', () => {
   clearTimeout(rz);
-  rz = setTimeout(() => { if (state.data) drawChart(state.data.records, $('#chart')); }, 200);
+  rz = setTimeout(() => {
+    if (!state.data) return;
+    drawChart(state.data.records, $('#chart'));
+    drawWinChart(state.data.records, $('#winChart'));
+  }, 200);
 });
 
 const bm = $('#bm');

@@ -169,3 +169,95 @@ main{max-width:1360px;margin:0 auto;padding:22px 26px 60px}
 
 .spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--teal);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- 策略胜率 ---------- */
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:112px 1fr 62px;align-items:center;gap:10px}
+.bar-name{display:flex;align-items:center;gap:6px;font-size:12px;min-width:0}
+.bar-name img{width:18px;height:18px;border-radius:50%;flex:none;object-fit:cover}
+.bar-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:6px;background:#0d1414;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.bar-track i{display:block;height:100%;border-radius:999px}
+.bar-track i.good{background:linear-gradient(90deg,#1fae8c,#2ee6b6)}
+.bar-track i.mid{background:linear-gradient(90deg,#b08a3c,#f0c66b)}
+.bar-track i.bad{background:linear-gradient(90deg,#8a4a43,#ff7a6b)}
+.bar-val{text-align:right;line-height:1.15}
+.bar-val b{font-size:13px;font-variant-numeric:tabular-nums}
+.bar-val small{display:block;font-size:10px;color:var(--muted)}
+.seg.mini button{padding:4px 9px;font-size:11px}
+
+/* ---------- 手机端 ---------- */
+@media (max-width:640px){
+  body{font-size:13px;-webkit-text-size-adjust:100%}
+  .topbar{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .brand{gap:8px}
+  .brand img{height:26px}
+  .brand-text strong{font-size:13px;letter-spacing:.1em}
+  .brand-text span{font-size:10px;letter-spacing:.22em}
+  .top-actions{gap:6px;width:100%;justify-content:flex-start}
+  .top-actions #updated{width:100%;font-size:11px;order:-1}
+  .btn{padding:7px 10px;font-size:12px}
+  .btn.small{padding:5px 8px;font-size:11px}
+  .hero-inner{padding:20px 14px 16px}
+  .hero-title h1{font-size:26px}
+  .hero-title p{font-size:12px;line-height:1.5}
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px}
+  .stat{padding:10px 12px;border-radius:10px}
+  .stat .k{font-size:11px}
+  .stat .v{font-size:20px}
+  .stat .v small{font-size:11px}
+  main{padding:12px 12px 40px}
+  .grid-two{gap:12px;margin-bottom:12px}
+  .panel{padding:14px;border-radius:12px}
+  .panel-head{gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .panel-head h2{font-size:14px}
+  .chart{height:168px}
+  .filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin:0 -14px;padding-left:14px;padding-right:14px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .seg{flex:0 0 auto}
+  .seg button{padding:5px 9px;font-size:11px}
+  .rec{grid-template-columns:1fr;gap:8px;padding:12px;border-radius:10px}
+  .rec .right{display:none}
+  .rec .time{font-size:11px}
+  .kpis{gap:8px 12px}
+  .kpi{font-size:11px}
+  .kpi b{font-size:14px}
+  .squad img{width:26px;height:26px;border-radius:6px}
+  .chip{font-size:10px;padding:2px 7px 2px 3px}
+  .chip img{width:14px;height:14px}
+  .ops{grid-template-columns:repeat(3,1fr);gap:6px}
+  .op img{width:44px;height:44px}
+  .op .nm{font-size:11px}
+  .bar-row{grid-template-columns:92px 1fr 54px;gap:8px}
+  .bar-name{font-size:11px}
+  .bar-name img{width:16px;height:16px}
+  .gate{padding:4px 0 16px}
+  .gate-card{padding:18px 16px;border-radius:14px}
+  .gate-card h2{font-size:17px}
+  .steps{padding-left:18px;gap:12px}
+  .bookmarklet{padding:8px 14px}
+  .modal{padding:0;align-items:flex-end}
+  .modal-card{border-radius:16px 16px 0 0;max-height:92vh;padding:18px 16px 28px;width:100%}
+  .m-grid{grid-template-columns:1fr}
+  .m-title{font-size:16px;line-height:1.4}
+  .foot{font-size:11px;margin-top:20px;padding:0 6px;line-height:1.7}
+  .toast{bottom:16px;font-size:12px;padding:9px 14px}
+}
+@media (max-width:380px){
+  .hero-title h1{font-size:22px}
+  .stat .v{font-size:18px}
+  .bar-row{grid-template-columns:80px 1fr 50px}
+}
+
+/* ---------- 手机端：顶栏压成一行 ---------- */
+@media (max-width:640px){
+  .topbar{flex-wrap:nowrap;padding:8px 12px;gap:8px}
+  .brand{flex:1 1 auto;min-width:0}
+  .brand-text strong{font-size:12px;letter-spacing:.08em;white-space:nowrap}
+  .brand-text span{font-size:9px;letter-spacing:.18em}
+  .top-actions{width:auto;flex:0 0 auto;gap:6px;flex-wrap:nowrap}
+  .top-actions #updated{display:none}
+  #btn-export{display:none}
+  .btn{padding:6px 10px;font-size:12px}
+  .hero-title h1{font-size:24px}
+}
