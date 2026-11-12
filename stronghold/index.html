@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="no-referrer" />
+<title>卫戍协议 · 战绩查询</title>
+<meta name="description" content="森空岛《明日方舟》卫戍协议战绩查询：奖杯曲线、成功率、常用干员、每局详情。" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img id="logo" src="" alt="" hidden />
+    <div class="brand-text"><strong>卫戍协议</strong><span>战绩查询</span></div>
+  </div>
+  <div class="top-actions">
+    <span id="updated" class="muted"></span>
+    <button id="btn-refresh" class="btn" disabled>刷新</button>
+    <button id="btn-export" class="btn" disabled>导出 JSON</button>
+    <button id="btn-account" class="btn ghost" hidden>更换账号</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-inner">
+    <div class="hero-title">
+      <h1>卫戍协议 <span>战绩</span></h1>
+      <p id="seasonLine" class="muted">登录森空岛后，读取你在《明日方舟》卫戍协议里的对局记录</p>
+    </div>
+    <div id="stats" class="stats"></div>
+  </div>
+</section>
+
+<main>
+  <!-- 未登录 / 未授权：取凭据引导 -->
+  <section id="gate" class="gate" hidden>
+    <div class="gate-card">
+      <h2>先把自己登录到森空岛</h2>
+      <p class="muted">
+        这个页面是纯静态的，跑在你自己的浏览器里，不经过任何服务器。它需要你从<b>森空岛官网</b>取一份登录凭据来调用官方接口 —— 全程由你本人操作，页面不会看到你的密码。
+      </p>
+
+      <ol class="steps">
+        <li>
+          <b>打开官网并登录</b><br />
+          <a class="link" href="https://game.skland.com/arknights/stronghold-guide/edit" target="_blank" rel="noopener noreferrer">game.skland.com/arknights/stronghold-guide/edit</a>
+          ，用手机验证码 / 密码 / 扫码登录你的账号。
+        </li>
+        <li>
+          <b>把下面这个按钮拖到浏览器书签栏</b>（或直接点「复制书签代码」，然后新建一个书签，把代码粘进网址栏）<br />
+          <a id="bm" class="bookmarklet" href="#" draggable="true" title="拖我到书签栏">🛡️ 获取战绩</a>
+          <button id="btn-copy-bm" class="btn small">复制书签代码</button>
+        </li>
+        <li>
+          <b>回到刚才那个官网页面，点一下书签</b><br />
+          它会读取你自己的凭据，自动跳回这里并展示战绩。
+        </li>
+      </ol>
+
+      <details class="paste">
+        <summary class="muted small">书签拖不动？手动粘贴凭据</summary>
+        <p class="muted small">在官网页面按 F12 → Console，粘贴执行：<br />
+          <code>copy(JSON.stringify({k:localStorage.SK_OAUTH_CRED_KEY,t:localStorage.SK_TOKEN_CACHE_KEY,d:JSON.parse(localStorage.SK_SHUMEI_DEVICE_ID_KEY||"{}").id}))</code><br />
+          然后把剪贴板内容贴到下面。
+        </p>
+        <textarea id="pasteBox" rows="3" placeholder='{"k":"…","t":"…","d":"…"}'></textarea>
+        <button id="btn-paste" class="btn small">使用粘贴的凭据</button>
+      </details>
+
+      <p class="muted small note">凭据只保存在你自己的浏览器 localStorage 里，随时点右上角「更换账号」清除。</p>
+    </div>
+  </section>
+
+  <!-- 有数据 -->
+  <div id="content" hidden>
+    <div class="grid-two" id="trendRow">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>奖杯曲线</h2>
+          <div class="legend"><i class="dot win"></i>成功 <i class="dot lose"></i>中断</div>
+        </div>
+        <div id="chart" class="chart"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>常用干员</h2><span class="muted small" id="opHint"></span></div>
+        <div id="operators" class="ops"></div>
+      </section>
+    </div>
+
+    <section class="panel" id="listPanel">
+      <div class="panel-head wrap">
+        <h2>对局记录 <span id="count" class="count"></span></h2>
+        <div class="filters">
+          <div class="seg" data-filter="result">
+            <button data-v="all" class="on">全部</button>
+            <button data-v="win">成功</button>
+            <button data-v="lose">中断</button>
+          </div>
+          <div class="seg" data-filter="mode">
+            <button data-v="all" class="on">全部模式</button>
+            <button data-v="MULTI">多人</button>
+            <button data-v="SINGLE">单人</button>
+          </div>
+          <div class="seg" data-filter="diff">
+            <button data-v="all" class="on">全部难度</button>
+            <button data-v="ABYSS">深渊</button>
+            <button data-v="HARD">困难</button>
+            <button data-v="NORMAL">普通</button>
+          </div>
+        </div>
+      </div>
+      <div id="list" class="list"></div>
+    </section>
+  </div>
+
+  <footer class="foot muted small">
+    数据来自森空岛官方攻略工具接口，凭据仅存于本机浏览器；页面为纯静态，不上传任何数据。
+  </footer>
+</main>
+
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
